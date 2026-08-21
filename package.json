@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node --test",
     "build": "node tools/build.js",
-    "check": "npm test && npm run build"
+    "test:artifact": "node tools/artifact-check.js",
+    "check": "npm test && npm run build && npm run test:artifact"
   },
   "engines": { "node": ">=22" },
   "license": "MIT"
