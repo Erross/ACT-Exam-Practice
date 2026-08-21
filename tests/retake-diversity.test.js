@@ -14,7 +14,7 @@ function exactOverlap(a,b){
   return b.filter(q=>ids.has(q.id)).length;
 }
 
-function meanRetakeOverlap(drawFn,pairs=200){
+function meanRetakeOverlap(drawFn,pairs=500){
   let sum=0;
   for(let i=1;i<=pairs;i++){
     const a=drawFn(mulberry32(i*2-1));
@@ -34,8 +34,9 @@ test("expanded ACT banks stay within measured retake-overlap ceilings",()=>{
   for(const [section,value] of Object.entries(values)){
     console.log(`${section} mean retake exact-item overlap: ${value.toFixed(2)}/${SECTIONS[section].totalItems}`);
   }
-  assert(values.math<=SECTIONS.math.totalItems*0.50,`math retake overlap ${values.math.toFixed(2)} is too high`);
-  assert(values.english<=SECTIONS.english.totalItems*0.60,`english retake overlap ${values.english.toFixed(2)} is too high`);
+  assert(values.math<=SECTIONS.math.totalItems*0.40,`math retake overlap ${values.math.toFixed(2)} exceeds the 40% release target`);
+  assert(values.english<=SECTIONS.english.totalItems*0.40,`english retake overlap ${values.english.toFixed(2)} exceeds the 40% release target`);
+  // Reading and Science remain on temporary draft ceilings until their release-scale expansions land.
   assert(values.reading<=SECTIONS.reading.totalItems*0.50,`reading retake overlap ${values.reading.toFixed(2)} is too high`);
   assert(values.science<=SECTIONS.science.totalItems*0.60,`science retake overlap ${values.science.toFixed(2)} is too high`);
 });
