@@ -2,7 +2,9 @@ import { SECTIONS, CATEGORY_LABELS } from "./config.js";
 import { MATH_QUESTIONS } from "../data/math.js";
 import { ENGLISH_PASSAGES } from "../data/english.js";
 import { READING_PASSAGES } from "../data/reading.js";
+import { SCIENCE_SETS } from "../data/science.js";
 import { drawMathSection, drawEnglishSection, drawReadingSection } from "./core/draw.js";
+import { drawScienceSection } from "./core/science-draw.js";
 import { mulberry32 } from "./core/random.js";
 import { scoreResponses } from "./core/scoring.js";
 
@@ -33,6 +35,7 @@ function startSection(sectionId) {
   if(sectionId==='math') state.questions=drawMathSection(MATH_QUESTIONS,section,rng);
   else if(sectionId==='english') state.questions=drawEnglishSection(ENGLISH_PASSAGES,section,rng);
   else if(sectionId==='reading') state.questions=drawReadingSection(READING_PASSAGES,section,rng);
+  else if(sectionId==='science') state.questions=drawScienceSection(SCIENCE_SETS,section,rng);
   else throw new Error(`Section ${sectionId} is not implemented`);
   state.sectionId=sectionId;
   state.responses={}; state.index=0; state.startedAt=Date.now(); state.secondsLeft=section.minutes*60;
@@ -50,7 +53,8 @@ function renderQuestion() {
     passage.hidden=false;
     $('#passage-title').textContent=q.passageTitle;
     const format=q.passageFormat && q.passageFormat!=='single' ? ` · ${q.passageFormat.toUpperCase()} format` : '';
-    $('#passage-meta').textContent=`${q.passageGenre} passage${format} · question ${q.passageQuestionNumber} of ${q.passageQuestionCount} in this set`;
+    const descriptor=state.sectionId==='science' ? `${q.passageGenre} science set` : `${q.passageGenre} passage`;
+    $('#passage-meta').textContent=`${descriptor}${format} · question ${q.passageQuestionNumber} of ${q.passageQuestionCount} in this set`;
     $('#passage-text').textContent=q.passageText;
   } else {
     passage.hidden=true;
