@@ -4,18 +4,18 @@ import { ENGLISH_PASSAGES } from "../data/english.js";
 
 const validCategories=new Set(["POW","KLA","CSE"]);
 
-test("expanded English bank has 6 long + 6 short passages",()=>{
-  assert.equal(ENGLISH_PASSAGES.length,12);
-  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="long").length,6);
-  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="short").length,6);
-  assert.equal(ENGLISH_PASSAGES.reduce((n,p)=>n+p.questions.length,0),90);
+test("release-scale English bank has 10 long + 10 short passages",()=>{
+  assert.equal(ENGLISH_PASSAGES.length,20);
+  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="long").length,10);
+  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="short").length,10);
+  assert.equal(ENGLISH_PASSAGES.reduce((n,p)=>n+p.questions.length,0),150);
 });
 
 test("English passage and question schema is internally consistent",()=>{
   const passageIds=new Set(); const questionIds=new Set();
   for(const p of ENGLISH_PASSAGES){
     assert(!passageIds.has(p.id)); passageIds.add(p.id);
-    assert(p.title && p.text && p.genre);
+    assert(p.title && p.text && p.genre && p.writingType && p.domain);
     assert.equal(p.questions.length,p.length==="long"?10:5);
     const counts={POW:0,KLA:0,CSE:0};
     for(const q of p.questions){
