@@ -32,10 +32,13 @@ export const SECTIONS = Object.freeze({
     id: "science", label: "Science", totalItems: 40, scoredItems: 34, fieldTestItems: 6,
     minutes: 40, status: "draft", optional: true,
     operationalBlueprint: { IOD: [13,17], SIN: [6,11], EAM: [8,13] },
-    // Fixed valid form within ACT's final enhanced passage ranges.
     operationalFormatBlueprint: { DR: 2, RS: 3, CV: 1 },
-    operationalFormatItemTotals: { DR: 10, RS: 18, CV: 6 },
-    operationalDomainBlueprint: { life: 2, earth: 1, physics: 1, chemistry: 1, engineering: 1 },
+    operationalFormatItemRanges: { DR: [10,12], RS: [16,20], CV: [6,7] },
+    // Primary content areas. Engineering/design is a secondary code, not a fifth primary domain.
+    operationalContentAreaBlueprint: { life: [2,2], earth: [1,2], physics: [1,2], chemistry: [1,2] },
+    engineeringDesignPassageRange: [1,3],
+    // ACT's final blueprint note caps all seven passages including the EFT passage.
+    totalContentAreaMaxWithFieldTest: { life: 3, earth: 2, physics: 2, chemistry: 2 },
     backgroundKnowledgeRange: [5,8],
   },
 });
