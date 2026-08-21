@@ -1,5 +1,5 @@
-const KEY = "act-practice-session-v2";
-export const SESSION_VERSION = 2;
+const KEY = "act-practice-session-v3";
+export const SESSION_VERSION = 3;
 
 function defaultStorage(){
   return typeof localStorage === "undefined" ? null : localStorage;
@@ -31,6 +31,7 @@ export function isRestorableSession(session){
   if(typeof session.sectionId!=="string") return false;
   if(!Array.isArray(session.questions) || !session.questions.length) return false;
   if(!session.responses || typeof session.responses!=="object") return false;
+  if(!session.flags || typeof session.flags!=="object" || Array.isArray(session.flags)) return false;
   if(!Number.isInteger(session.index) || session.index<0 || session.index>=session.questions.length) return false;
   if(session.phase==="practice" && !Number.isFinite(session.deadlineAt)) return false;
   if(session.mode==="full"){
