@@ -17,7 +17,10 @@ export const SECTIONS = Object.freeze({
   math: {
     id: "math", label: "Mathematics", totalItems: 45, scoredItems: 41, fieldTestItems: 4,
     minutes: 50, status: "draft",
-    operationalBlueprint: { NQ: 5, A: 8, F: 8, G: 8, S: 4, IES: 8 },
+    // One valid fixed form inside ACT's final enhanced operational ranges:
+    // PHM 33 = NQ 5 + Algebra 7 + Functions 8 + Geometry 8 + Statistics & Probability 5;
+    // IES 8. Modeling overlaps these categories and must cover at least 8 operational items.
+    operationalBlueprint: { NQ: 5, A: 7, F: 8, G: 8, S: 5, IES: 8 },
     modelingMinimum: 8,
   },
   reading: {
