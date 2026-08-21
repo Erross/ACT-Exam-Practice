@@ -96,7 +96,7 @@ function attachPassage(passage, scored, rng) {
     scored,
     passageId: passage.id,
     passageTitle: passage.title,
-    passageText: passage.text,
+    passageText: passage.displayText || passage.text,
     passageLength: passage.length,
     passageGenre: passage.genre,
     passageWritingType: passage.writingType || null,
