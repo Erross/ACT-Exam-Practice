@@ -24,7 +24,7 @@ function meanRetakeOverlap(drawFn,pairs=200){
   return sum/pairs;
 }
 
-test("retake exact-item overlap is measured across every ACT section",()=>{
+test("expanded ACT banks stay within measured retake-overlap ceilings",()=>{
   const values={
     math:meanRetakeOverlap(rng=>drawMathSection(MATH_QUESTIONS,SECTIONS.math,rng)),
     english:meanRetakeOverlap(rng=>drawEnglishSection(ENGLISH_PASSAGES,SECTIONS.english,rng)),
@@ -33,9 +33,9 @@ test("retake exact-item overlap is measured across every ACT section",()=>{
   };
   for(const [section,value] of Object.entries(values)){
     console.log(`${section} mean retake exact-item overlap: ${value.toFixed(2)}/${SECTIONS[section].totalItems}`);
-    assert(value<SECTIONS[section].totalItems,`${section} retake is effectively identical`);
   }
-  // Math is already at launch-scale depth. Science should now have meaningful variation after its first expansion.
   assert(values.math<=SECTIONS.math.totalItems*0.50,`math retake overlap ${values.math.toFixed(2)} is too high`);
-  assert(values.science<=SECTIONS.science.totalItems*0.65,`science retake overlap ${values.science.toFixed(2)} is too high`);
+  assert(values.english<=SECTIONS.english.totalItems*0.60,`english retake overlap ${values.english.toFixed(2)} is too high`);
+  assert(values.reading<=SECTIONS.reading.totalItems*0.50,`reading retake overlap ${values.reading.toFixed(2)} is too high`);
+  assert(values.science<=SECTIONS.science.totalItems*0.60,`science retake overlap ${values.science.toFixed(2)} is too high`);
 });
