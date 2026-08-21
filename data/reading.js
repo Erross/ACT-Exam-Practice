@@ -2,6 +2,7 @@ import { READING_LITERARY_PASSAGES } from './reading/literary.js';
 import { READING_INFORMATIONAL_SINGLE_PASSAGES } from './reading/informational-single.js';
 import { READING_INFORMATIONAL_MULTI_PASSAGES } from './reading/informational-multi.js';
 import { READING_EXPANSION_V1 } from './reading/expansion-v1.js';
+import { READING_TEXT_FIDELITY } from './reading-text-fidelity.js';
 import { applyReadingChoiceRepairs } from './reading-choice-repairs.js';
 
 const RAW_READING_PASSAGES = [
@@ -35,9 +36,26 @@ const VQI_SUPPLEMENTS = Object.freeze({
   }),
 });
 
+function browserDisplayText(id,text){
+  if(id==="R-INFO-VQI-BIKES"){
+    return text.replace(/\n\nDATA SUMMARY\nYear before lane:[^\n]*\nFirst year after:[^\n]*\nSecond year after:[^\n]*\n\n/,"\n\n");
+  }
+  if(id==="R-VQI-BIKESHARE"){
+    return text.replace(/\n\nStation \| Bikes at 7:30 \| Empty docks \| Expected net change by 8:30\nMaple[^\n]*\nCentral[^\n]*\nRiver[^\n]*\nMarket[^\n]*\n\n/,"\n\n");
+  }
+  return text;
+}
+
 const repaired=applyReadingChoiceRepairs(RAW_READING_PASSAGES);
 export const READING_PASSAGES = Object.freeze(repaired.map(passage=>{
+  const text=READING_TEXT_FIDELITY[passage.id];
   const supplement=VQI_SUPPLEMENTS[passage.id] || null;
+  if(!text) throw new Error(`Missing ACT-length Reading text for ${passage.id}`);
   if(passage.format==="vqi" && !supplement) throw new Error(`Missing structured VQI supplement for ${passage.id}`);
-  return Object.freeze({...passage,supplement});
+  return Object.freeze({
+    ...passage,
+    text,
+    displayText:browserDisplayText(passage.id,text),
+    supplement,
+  });
 }));
