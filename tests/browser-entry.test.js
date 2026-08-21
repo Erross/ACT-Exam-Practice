@@ -26,7 +26,7 @@ test("browser entry module parses and its literal imports resolve",()=>{
   execFileSync(process.execPath,["--check",APP],{stdio:"pipe"});
   const app=readFileSync(APP,"utf8");
   const imports=relativeImports(app);
-  assert(imports.length>=8,"app.js unexpectedly has too few static imports");
+  assert(imports.length>=9,"app.js unexpectedly has too few static imports");
   for(const specifier of imports){
     const resolved=resolve(dirname(APP),specifier);
     assert(existsSync(resolved),`browser import does not resolve: ${specifier}`);
@@ -40,7 +40,20 @@ test("index supplies every literal DOM target required by app.js",()=>{
   for(const id of literalDomIds(app)){
     assert(html.includes(`id="${id}"`),`app.js references missing DOM id #${id}`);
   }
-  for(const id of ["home","practice","between","results","full-results"]){
+  for(const id of ["home","preflight","practice","between","results","full-results"]){
     assert(html.includes(`id="${id}"`),`dynamic view id #${id} is missing`);
   }
+});
+
+test("browser shell exposes the release-critical navigation and accessibility controls",()=>{
+  const html=readFileSync(INDEX,"utf8");
+  assert.match(html,/class="skip-link"\s+href="#main-content"/);
+  assert.match(html,/id="timer"[^>]*role="timer"/);
+  assert.match(html,/id="flag-question"[^>]*aria-pressed="false"/);
+  assert.match(html,/id="navigator-grid"/);
+  assert.match(html,/aria-label="Question navigator"/);
+  assert.match(html,/id="submit-section"/);
+  assert.match(html,/id="begin-preflight"/);
+  assert.match(html,/id="answer-review"/);
+  assert.match(html,/id="full-answer-review"/);
 });
