@@ -6,6 +6,7 @@ import { READING_RELEASE_EXPANSION } from './reading/release-expansion.js';
 import { READING_TEXT_FIDELITY } from './reading-text-fidelity.js';
 import { applyReadingChoiceRepairs } from './reading-choice-repairs.js';
 import { applyReadingTellRepairs } from './reading-tell-repairs.js';
+import { applyReadingReleaseQualityRepairs } from './reading-release-quality-repairs.js';
 import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
 
 const RAW_READING_PASSAGES = [
@@ -57,7 +58,9 @@ function browserDisplayText(id,text){
   return text;
 }
 
-const repaired=applyReadingTellRepairs(applyReadingChoiceRepairs(RAW_READING_PASSAGES));
+const repaired=applyReadingReleaseQualityRepairs(
+  applyReadingTellRepairs(applyReadingChoiceRepairs(RAW_READING_PASSAGES))
+);
 const enriched=repaired.map(passage=>{
   const baseText=READING_TEXT_FIDELITY[passage.id] || passage.text;
   const text=RELEASE_TEXT_ADJUSTMENTS[passage.id] ? RELEASE_TEXT_ADJUSTMENTS[passage.id](baseText) : baseText;
