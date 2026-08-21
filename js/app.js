@@ -8,6 +8,7 @@ import { drawScienceSection } from "./core/science-draw.js";
 import { buildFullTestQueue, summarizeFullTest } from "./core/full-test.js";
 import { mulberry32 } from "./core/random.js";
 import { scoreResponses } from "./core/scoring.js";
+import { attemptStatus, buildAnswerReview, answerText } from "./core/attempt-review.js";
 import { saveSession, loadSession, clearSession, isRestorableSession, remainingSeconds } from "./core/session.js";
 
 const $ = s => document.querySelector(s);
@@ -15,8 +16,10 @@ const state = {
   mode: "section",
   phase: null,
   sectionId: null,
+  preflightSectionId: null,
   questions: [],
   responses: {},
+  flags: {},
   index: 0,
   startedAt: null,
   deadlineAt: null,
@@ -33,13 +36,15 @@ function formatTime(sec) {
 }
 
 function hideAllViews(){
-  for(const id of ['home','practice','between','results','full-results']) $(`#${id}`).hidden=true;
+  for(const id of ['home','preflight','practice','between','results','full-results']) $(`#${id}`).hidden=true;
 }
 
 function resetRuntime(){
   clearInterval(state.timer);
-  state.mode='section'; state.phase=null; state.sectionId=null; state.questions=[]; state.responses={}; state.index=0;
-  state.startedAt=null; state.deadlineAt=null; state.secondsLeft=0; state.fullQueue=[]; state.fullIndex=0; state.fullResults={};
+  state.mode='section'; state.phase=null; state.sectionId=null; state.preflightSectionId=null;
+  state.questions=[]; state.responses={}; state.flags={}; state.index=0;
+  state.startedAt=null; state.deadlineAt=null; state.secondsLeft=0;
+  state.fullQueue=[]; state.fullIndex=0; state.fullResults={};
 }
 
 function sessionSnapshot(){
@@ -49,6 +54,7 @@ function sessionSnapshot(){
     sectionId:state.sectionId,
     questions:state.questions,
     responses:state.responses,
+    flags:state.flags,
     index:state.index,
     startedAt:state.startedAt,
     deadlineAt:state.deadlineAt,
@@ -88,8 +94,8 @@ function renderHome() {
   for (const section of Object.values(SECTIONS)) {
     const card=document.createElement('article'); card.className='card';
     const available=section.status==='draft';
-    const calculator=section.id==='math' ? '<p>Calculator permitted · online ACT includes Desmos</p>' : '';
-    card.innerHTML=`<div class="eyebrow">${section.optional?'Optional section':'Core section'}</div><h2>${section.label}</h2><p>${section.totalItems} questions · ${section.minutes} minutes</p><p>${section.scoredItems} scored + ${section.fieldTestItems} embedded field-test items</p>${calculator}<button ${available?'':'disabled'}>${available?'Start draft practice':'Content in development'}</button>`;
+    const calculator=section.id==='math' ? '<p>Calculator permitted · online ACT includes Desmos</p>' : '<p>No calculator for this section</p>';
+    card.innerHTML=`<div class="eyebrow">${section.optional?'Optional section':'Core section'}</div><h2>${section.label}</h2><p>${section.totalItems} questions · ${section.minutes} minutes</p><p>${section.scoredItems} scored + ${section.fieldTestItems} embedded field-test items</p>${calculator}<button ${available?'':'disabled'}>${available?'Review details & start':'Content in development'}</button>`;
     if (available) card.querySelector('button').addEventListener('click',()=>startSection(section.id));
     cards.appendChild(card);
   }
@@ -105,12 +111,38 @@ function drawForSection(sectionId,rng){
   throw new Error(`Section ${sectionId} is not implemented`);
 }
 
+function appendRule(text){
+  const li=document.createElement('li'); li.textContent=text; $('#preflight-rules').appendChild(li);
+}
+
+function showPreflight(sectionId){
+  const section=SECTIONS[sectionId];
+  state.preflightSectionId=sectionId;
+  hideAllViews(); $('#preflight').hidden=false;
+  $('#preflight-mode').textContent=state.mode==='full'
+    ? `Full ACT · Section ${state.fullIndex+1} of ${state.fullQueue.length}`
+    : 'Individual section practice';
+  $('#preflight-title').textContent=`${section.label} preflight`;
+  $('#preflight-summary').textContent=`${section.totalItems} questions · ${section.minutes} minutes · ${section.scoredItems} scored + ${section.fieldTestItems} embedded non-scored field-test items.`;
+  const rules=$('#preflight-rules'); rules.innerHTML='';
+  appendRule('The section timer does not start on this screen. It begins when you press “Begin section and start timer.”');
+  appendRule(sectionId==='math'
+    ? 'A permitted calculator may be used on Mathematics; the online ACT includes Desmos. The practice questions are designed for the current four-choice Math format.'
+    : 'A calculator is not permitted for this section.');
+  appendRule('Use the question navigator to move within the current section. Flag questions for review and return to them before submitting.');
+  appendRule('Submitting ends the section. If questions are unanswered or flagged, the app warns you before submission.');
+  appendRule('Embedded field-test items are mixed into the section and do not count toward the scored raw result. They are identified only after submission.');
+  appendRule('Any 1–36 section score, Composite, or STEM score shown here is an unofficial estimate based on published official practice-form conversions.');
+  if(state.mode==='full') appendRule('Full-test section scores stay hidden until the entire attempt ends. After leaving a completed section, you cannot return to it. ACT Writing is not included in this practice app.');
+  $('#preflight-title').focus();
+}
+
 function startTimer(){
   clearInterval(state.timer);
   const tick=()=>{
     state.secondsLeft=Math.max(0,Math.ceil((state.deadlineAt-Date.now())/1000));
     $('#timer').textContent=formatTime(state.secondsLeft);
-    if(!state.secondsLeft){ clearInterval(state.timer); finishSection(); }
+    if(!state.secondsLeft){ clearInterval(state.timer); finishSection(true); }
   };
   tick();
   if(state.secondsLeft) state.timer=setInterval(tick,1000);
@@ -121,20 +153,21 @@ function beginSection(sectionId) {
   const seed=(Date.now() ^ Math.floor(Math.random()*0xffffffff))>>>0;
   state.questions=drawForSection(sectionId,mulberry32(seed));
   state.sectionId=sectionId;
+  state.preflightSectionId=null;
   state.phase='practice';
-  state.responses={}; state.index=0; state.startedAt=Date.now();
+  state.responses={}; state.flags={}; state.index=0; state.startedAt=Date.now();
   state.deadlineAt=state.startedAt+section.minutes*60*1000;
   state.secondsLeft=section.minutes*60;
   hideAllViews(); $('#practice').hidden=false;
   persistSession();
   startTimer();
-  renderQuestion();
+  renderQuestion(true);
 }
 
 function startSection(sectionId) {
   clearSession();
   state.mode='section'; state.fullQueue=[]; state.fullResults={}; state.fullIndex=0;
-  beginSection(sectionId);
+  showPreflight(sectionId);
 }
 
 function startFullTest(includeScience){
@@ -143,7 +176,7 @@ function startFullTest(includeScience){
   state.fullQueue=buildFullTestQueue(includeScience);
   state.fullIndex=0;
   state.fullResults={};
-  beginSection(state.fullQueue[0]);
+  showPreflight(state.fullQueue[0]);
 }
 
 function restoreSavedAttempt(){
@@ -151,7 +184,7 @@ function restoreSavedAttempt(){
   if(!isRestorableSession(saved)){ clearSession(); renderHome(); return; }
   resetRuntime();
   state.mode=saved.mode; state.phase=saved.phase; state.sectionId=saved.sectionId;
-  state.questions=saved.questions; state.responses=saved.responses; state.index=saved.index;
+  state.questions=saved.questions; state.responses=saved.responses; state.flags=saved.flags; state.index=saved.index;
   state.startedAt=saved.startedAt || null; state.deadlineAt=saved.deadlineAt || null;
   state.fullQueue=saved.fullQueue || []; state.fullIndex=saved.fullIndex || 0; state.fullResults=saved.fullResults || {};
   if(state.phase==='between'){
@@ -160,9 +193,9 @@ function restoreSavedAttempt(){
   }
   state.secondsLeft=remainingSeconds(saved);
   hideAllViews(); $('#practice').hidden=false;
-  if(!state.secondsLeft){ finishSection(); return; }
+  if(!state.secondsLeft){ finishSection(true); return; }
   startTimer();
-  renderQuestion();
+  renderQuestion(true);
 }
 
 function buildTable(spec){
@@ -206,7 +239,31 @@ function passageDescriptor(q){
   return `${q.passageGenre} passage`;
 }
 
-function renderQuestion() {
+function currentAttemptStatus(){ return attemptStatus(state.questions,state.responses,state.flags); }
+
+function renderNavigator(){
+  const host=$('#navigator-grid'); host.innerHTML='';
+  state.questions.forEach((q,index)=>{
+    const btn=document.createElement('button'); btn.type='button'; btn.className='nav-item'; btn.textContent=String(index+1);
+    const answered=state.responses[q.id]!==undefined;
+    const flagged=Boolean(state.flags[q.id]);
+    const current=index===state.index;
+    btn.classList.toggle('answered',answered);
+    btn.classList.toggle('flagged',flagged);
+    btn.classList.toggle('current',current);
+    if(current) btn.setAttribute('aria-current','true');
+    const labels=[answered?'answered':'not answered'];
+    if(flagged) labels.push('flagged for review');
+    if(current) labels.push('current question');
+    btn.setAttribute('aria-label',`Question ${index+1}, ${labels.join(', ')}`);
+    btn.addEventListener('click',()=>goToQuestion(index,true));
+    host.appendChild(btn);
+  });
+  const status=currentAttemptStatus();
+  $('#attempt-status').textContent=`${status.answered}/${status.total} answered · ${status.flagged} flagged`;
+}
+
+function renderQuestion(focus=false) {
   const q=state.questions[state.index];
   $('#timer').textContent=formatTime(state.secondsLeft);
   const fullPrefix=state.mode==='full' ? `Full ACT · ${state.fullIndex+1}/${state.fullQueue.length} sections · ` : '';
@@ -228,11 +285,40 @@ function renderQuestion() {
   const list=$('#choices'); list.innerHTML='';
   q.choices.forEach((text,i)=>{
     const letter='ABCD'[i]; const label=document.createElement('label'); label.className='choice';
-    label.innerHTML=`<input type="radio" name="choice" value="${letter}" ${state.responses[q.id]===letter?'checked':''}><span><strong>${letter}.</strong> ${text}</span>`;
-    label.querySelector('input').addEventListener('change',e=>{ state.responses[q.id]=e.target.value; persistSession(); });
+    const input=document.createElement('input'); input.type='radio'; input.name='choice'; input.value=letter; input.checked=state.responses[q.id]===letter;
+    const span=document.createElement('span'); const strong=document.createElement('strong'); strong.textContent=`${letter}. `; span.appendChild(strong); span.appendChild(document.createTextNode(text));
+    label.appendChild(input); label.appendChild(span);
+    input.addEventListener('change',e=>{ state.responses[q.id]=e.target.value; persistSession(); renderNavigator(); });
     list.appendChild(label);
   });
-  $('#prev').disabled=state.index===0; $('#next').textContent=state.index===state.questions.length-1?'Finish section':'Next';
+  const flagged=Boolean(state.flags[q.id]);
+  $('#flag-question').setAttribute('aria-pressed',flagged?'true':'false');
+  $('#flag-question').textContent=flagged?'Unflag question':'Flag for review';
+  $('#prev').disabled=state.index===0;
+  $('#next').textContent=state.index===state.questions.length-1?'Review & submit':'Next';
+  renderNavigator();
+  if(focus) $('#stem').focus();
+}
+
+function goToQuestion(index,focus=false){
+  if(index<0 || index>=state.questions.length) return;
+  state.index=index; persistSession(); renderQuestion(focus);
+}
+
+function renderReviewItems(host,review){
+  host.innerHTML='';
+  for(const item of review){
+    const article=document.createElement('article'); article.className='review-item';
+    const heading=document.createElement('h3');
+    const isCorrect=item.response===item.correct;
+    const resultLabel=item.response===null?'Unanswered':isCorrect?'Correct':'Incorrect';
+    heading.textContent=`Question ${item.number} · ${resultLabel}${item.scored?'':' · embedded field-test (not scored)'}`;
+    const stem=document.createElement('p'); stem.className='review-stem'; stem.textContent=item.stem;
+    const yours=document.createElement('p'); yours.textContent=`Your answer: ${answerText(item,item.response)}`;
+    const correct=document.createElement('p'); correct.textContent=`Correct answer: ${answerText(item,item.correct)}`;
+    const rationale=document.createElement('p'); rationale.className='review-rationale'; rationale.textContent=`Why: ${item.rationale}`;
+    article.append(heading,stem,yours,correct,rationale); host.appendChild(article);
+  }
 }
 
 function renderSectionResult(result){
@@ -247,9 +333,11 @@ function renderSectionResult(result){
   const rows=$('#category-results'); rows.innerHTML='';
   Object.entries(result.categories).forEach(([cat,v])=>{
     const div=document.createElement('div'); div.className='result-row';
-    div.innerHTML=`<span>${CATEGORY_LABELS[sectionId]?.[cat]||cat}</span><strong>${v.correct}/${v.total}</strong>`;
-    rows.appendChild(div);
+    const label=document.createElement('span'); label.textContent=CATEGORY_LABELS[sectionId]?.[cat]||cat;
+    const score=document.createElement('strong'); score.textContent=`${v.correct}/${v.total}`;
+    div.append(label,score); rows.appendChild(div);
   });
+  renderReviewItems($('#answer-review'),result.review);
 }
 
 function renderBetweenSections(){
@@ -257,7 +345,9 @@ function renderBetweenSections(){
   persistSession();
   hideAllViews(); $('#between').hidden=false;
   $('#completed-section').textContent=SECTIONS[state.sectionId].label;
-  $('#next-section').textContent=SECTIONS[state.fullQueue[state.fullIndex+1]].label;
+  const nextId=state.fullQueue[state.fullIndex+1]; const next=SECTIONS[nextId];
+  $('#next-section').textContent=next.label;
+  $('#next-section-detail').textContent=`${next.totalItems} questions · ${next.minutes} minutes · ${nextId==='math'?'calculator permitted':'no calculator'}. The timer starts when you press “Begin next section.”`;
 }
 
 function renderFullResults(){
@@ -274,21 +364,34 @@ function renderFullResults(){
     const result=state.fullResults[sectionId];
     const div=document.createElement('div'); div.className='result-row';
     const range=result.low===result.high?`${result.low}`:`${result.low}–${result.high}`;
-    const suffix=sectionId==='science'?' · not included in Composite':'';
-    div.innerHTML=`<span>${SECTIONS[sectionId].label}${suffix}<br><small>Raw ${result.raw}/${result.maxRaw} · estimate range ${range}</small></span><strong>${result.estimate}</strong>`;
-    rows.appendChild(div);
+    const label=document.createElement('span');
+    label.textContent=`${SECTIONS[sectionId].label}${sectionId==='science'?' · not included in Composite':''} — Raw ${result.raw}/${result.maxRaw} · estimate range ${range}`;
+    const score=document.createElement('strong'); score.textContent=String(result.estimate);
+    div.append(label,score); rows.appendChild(div);
   }
   if(summary.stem!==null){
     const div=document.createElement('div'); div.className='result-row';
     const range=summary.stemLow===summary.stemHigh?`${summary.stemLow}`:`${summary.stemLow}–${summary.stemHigh}`;
-    div.innerHTML=`<span>Estimated STEM<br><small>Average of Mathematics and Science · estimate range ${range}</small></span><strong>${summary.stem}</strong>`;
-    rows.appendChild(div);
+    const label=document.createElement('span'); label.textContent=`Estimated STEM — average of Mathematics and Science · estimate range ${range}`;
+    const score=document.createElement('strong'); score.textContent=String(summary.stem);
+    div.append(label,score); rows.appendChild(div);
+  }
+  const reviewHost=$('#full-answer-review'); reviewHost.innerHTML='';
+  for(const sectionId of state.fullQueue){
+    const details=document.createElement('details'); details.className='review-section';
+    const summaryNode=document.createElement('summary'); summaryNode.textContent=`${SECTIONS[sectionId].label} answer review`;
+    const body=document.createElement('div'); renderReviewItems(body,state.fullResults[sectionId].review);
+    details.append(summaryNode,body); reviewHost.appendChild(details);
   }
 }
 
-function finishSection() {
+function finishSection(timedOut=false) {
   clearInterval(state.timer);
-  const result=scoreResponses(state.questions,state.responses,state.sectionId);
+  const result={
+    ...scoreResponses(state.questions,state.responses,state.sectionId),
+    review:buildAnswerReview(state.questions,state.responses),
+    timedOut,
+  };
   if(state.mode==='full'){
     state.fullResults[state.sectionId]=result;
     if(state.fullIndex<state.fullQueue.length-1) renderBetweenSections();
@@ -298,14 +401,33 @@ function finishSection() {
   }
 }
 
-$('#prev').addEventListener('click',()=>{ if(state.index>0){ state.index--; persistSession(); renderQuestion(); } });
-$('#next').addEventListener('click',()=>{ if(state.index===state.questions.length-1) finishSection(); else { state.index++; persistSession(); renderQuestion(); } });
+function requestFinishSection(){
+  const status=currentAttemptStatus();
+  const notes=[];
+  if(status.unanswered) notes.push(`${status.unanswered} unanswered`);
+  if(status.flagged) notes.push(`${status.flagged} flagged for review`);
+  const message=notes.length
+    ? `You still have ${notes.join(' and ')}. Submit this section anyway?`
+    : 'Submit this section now? You will not be able to change answers afterward.';
+  if(confirm(message)) finishSection(false);
+}
+
+$('#prev').addEventListener('click',()=>{ if(state.index>0) goToQuestion(state.index-1,true); });
+$('#next').addEventListener('click',()=>{ if(state.index===state.questions.length-1) requestFinishSection(); else goToQuestion(state.index+1,true); });
+$('#flag-question').addEventListener('click',()=>{
+  const id=state.questions[state.index].id;
+  if(state.flags[id]) delete state.flags[id]; else state.flags[id]=true;
+  persistSession(); renderQuestion(false);
+});
+$('#submit-section').addEventListener('click',requestFinishSection);
 $('#exit').addEventListener('click',()=>{
   const message=state.mode==='full'?'End this full ACT attempt? Progress will be lost.':'End this practice attempt?';
   if(confirm(message)){ clearSession(); renderHome(); }
 });
 $('#start-full-core').addEventListener('click',()=>startFullTest(false));
 $('#start-full-science').addEventListener('click',()=>startFullTest(true));
+$('#begin-preflight').addEventListener('click',()=>beginSection(state.preflightSectionId));
+$('#cancel-preflight').addEventListener('click',renderHome);
 $('#continue-full').addEventListener('click',()=>{ state.fullIndex++; beginSection(state.fullQueue[state.fullIndex]); });
 $('#exit-full-between').addEventListener('click',()=>{ if(confirm('End this full ACT attempt? Progress will be lost.')){ clearSession(); renderHome(); } });
 $('#resume-attempt')?.addEventListener('click',restoreSavedAttempt);
