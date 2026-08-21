@@ -68,7 +68,14 @@ export function drawMathSection(bank, sectionConfig, rng = Math.random) {
     ...operational.map(q => ({ ...q, scored: true })),
     ...fieldTests.map(q => ({ ...q, scored: false })),
   ].map(q => shuffleQuestionChoices(q, rng));
-  const result = shuffle(combined, rng);
+
+  const rank=new Map(sectionConfig.difficultyOrder.map((name,index)=>[name,index]));
+  for(const q of combined){
+    if(!rank.has(q.difficulty)) throw new Error(`Invalid Math difficulty ${q.difficulty} for ${q.id}`);
+  }
+  // ACT's final enhanced framework specifies increasing difficulty across the displayed Math section.
+  // Shuffle first so items within the same calibrated tier still vary across attempts, then use a stable tier sort.
+  const result = shuffle(combined,rng).sort((a,b)=>rank.get(a.difficulty)-rank.get(b.difficulty));
   if (result.length !== sectionConfig.totalItems || !assertUniqueFamilies(result)) {
     throw new Error("Invalid final section draw");
   }
@@ -92,7 +99,10 @@ function attachPassage(passage, scored, rng) {
     passageText: passage.text,
     passageLength: passage.length,
     passageGenre: passage.genre,
+    passageWritingType: passage.writingType || null,
+    passageDomain: passage.domain || null,
     passageFormat: passage.format || "single",
+    passageSupplement: passage.supplement || null,
     passageQuestionNumber: index + 1,
     passageQuestionCount: passage.questions.length,
   }, rng));
@@ -130,11 +140,13 @@ function isValidEnglishOperationalSet(passages,sectionConfig){
   for(const [length,expected] of Object.entries(sectionConfig.operationalPassageLengthBlueprint)){
     if((lengthCounts[length]||0)!==expected) return false;
   }
-  const typeCounts=countBy(passages,p=>p.genre);
+  const typeCounts=countBy(passages,p=>p.writingType);
   for(const [type,[min,max]] of Object.entries(sectionConfig.operationalWritingTypeBlueprint)){
     const value=typeCounts[type]||0;
     if(value<min || value>max) return false;
   }
+  const domainCounts=countBy(passages,p=>p.domain);
+  if(Object.values(domainCounts).some(value=>value>sectionConfig.operationalDomainMax)) return false;
   const questions=passages.flatMap(p=>p.questions);
   if(questions.length!==sectionConfig.scoredItems) return false;
   try { assertRangeBlueprint(questions,sectionConfig.operationalBlueprint); } catch { return false; }
@@ -181,22 +193,27 @@ export function drawEnglishSection(passages, sectionConfig, rng = Math.random) {
   return result;
 }
 
-function isValidReadingOperationalSet(passages, blueprint) {
+function isValidReadingOperationalSet(passages, sectionConfig) {
   if(passages.length!==3 || passages.some(p=>p.questions.length!==9)) return false;
   const genre=countBy(passages,p=>p.genre);
-  if((genre.literary||0)!==1 || (genre.informational||0)!==2) return false;
+  for(const [name,expected] of Object.entries(sectionConfig.operationalGenreBlueprint)){
+    if((genre[name]||0)!==expected) return false;
+  }
   const format=countBy(passages,p=>p.format||"single");
-  if((format.single||0)!==2 || ((format.paired||0)+(format.vqi||0))!==1) return false;
+  if((format.single||0)!==sectionConfig.operationalFormatBlueprint.single) return false;
+  if(((format.paired||0)+(format.vqi||0))!==sectionConfig.operationalFormatBlueprint.multi) return false;
   const length=countBy(passages,p=>String(p.length));
-  if((length["750"]||0)!==2 || (length["650"]||0)!==1) return false;
+  for(const [name,expected] of Object.entries(sectionConfig.operationalLengthBlueprint)){
+    if((length[name]||0)!==expected) return false;
+  }
   const questions=passages.flatMap(p=>p.questions);
-  try { assertRangeBlueprint(questions,blueprint); } catch { return false; }
+  try { assertRangeBlueprint(questions,sectionConfig.operationalBlueprint); } catch { return false; }
   return true;
 }
 
 export function drawReadingSection(passages, sectionConfig, rng = Math.random) {
   const eligible=passages.filter(p=>p.questions.length===9);
-  const validForms=combinations(eligible,3).filter(combo=>isValidReadingOperationalSet(combo,sectionConfig.operationalBlueprint));
+  const validForms=combinations(eligible,3).filter(combo=>isValidReadingOperationalSet(combo,sectionConfig));
   if(!validForms.length) throw new Error("No valid Reading operational passage combination available");
   const operationalPassages=shuffle(validForms,rng)[0];
   const used=new Set(operationalPassages.map(p=>p.id));
