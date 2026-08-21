@@ -19,6 +19,7 @@ function validSession(overrides={}){
     sectionId:"math",
     questions:[{id:"Q1"}],
     responses:{},
+    flags:{Q1:true},
     index:0,
     deadlineAt:10_000,
     fullQueue:[],
@@ -28,12 +29,14 @@ function validSession(overrides={}){
   };
 }
 
-test("saved sessions round-trip with the current version",()=>{
+test("saved sessions round-trip with current answers and flags",()=>{
   const storage=memoryStorage();
-  saveSession(validSession(),storage);
+  saveSession(validSession({responses:{Q1:"B"}}),storage);
   const loaded=loadSession(storage);
   assert.equal(loaded.version,SESSION_VERSION);
   assert.equal(loaded.sectionId,"math");
+  assert.equal(loaded.responses.Q1,"B");
+  assert.equal(loaded.flags.Q1,true);
   assert.equal(isRestorableSession(loaded),true);
   clearSession(storage);
   assert.equal(loadSession(storage),null);
@@ -45,10 +48,11 @@ test("remaining time uses an absolute deadline instead of resetting on reload",(
   assert.equal(remainingSeconds(session,130_000),0);
 });
 
-test("invalid, old, and incomplete sessions are rejected",()=>{
+test("invalid, old, incomplete, and pre-flag sessions are rejected",()=>{
   assert.equal(isRestorableSession(null),false);
-  assert.equal(isRestorableSession(validSession({version:1})),false);
+  assert.equal(isRestorableSession(validSession({version:2})),false);
   assert.equal(isRestorableSession(validSession({questions:[]})),false);
+  assert.equal(isRestorableSession(validSession({flags:null})),false);
   assert.equal(isRestorableSession(validSession({deadlineAt:null})),false);
   assert.equal(isRestorableSession(validSession({mode:"full",fullQueue:["english"],fullResults:{}})),false);
 });
