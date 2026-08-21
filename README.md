@@ -25,13 +25,13 @@ The current development build provides:
 
 | Section | Draft content | Displayed per attempt |
 | --- | ---: | ---: |
-| English | 60 questions across 8 original passages | 50 |
+| English | 90 questions across 12 original passages | 50 |
 | Mathematics | 140 original questions across 70 variant families | 45 |
-| Reading | 54 questions across 6 original passages | 36 |
+| Reading | 81 questions across 9 original passages | 36 |
 | Science | 80 questions across 14 original science sets | 40 |
-| **Total** | **334 questions** | — |
+| **Total** | **391 questions** | — |
 
-These banks are **development drafts, not released banks**. Science has completed its first diversity expansion; English and Reading remain close to minimum runnable scale and require substantial expansion. All four sections still require independent clean-room content review and repair before promotion.
+These banks are **development drafts, not released banks**. English, Reading, and Science have now completed an initial diversity expansion beyond minimum runnable scale. All four sections still require deeper content review, difficulty/retake analysis, browser-effective usability review, and independent clean-room release auditing before promotion.
 
 ## Enhanced ACT structure modeled
 
