@@ -17,7 +17,7 @@
   </article>
   <article class="full-launch">
     <div class="eyebrow">Full-test mode</div><h2>Take a complete enhanced ACT practice attempt</h2>
-    <p>Run English → Mathematics → Reading in sequence, with optional Science afterward. Section scores stay hidden until the end, when an estimated ACT Composite and section estimates are shown.</p>
+    <p>Run English → Mathematics → Reading in sequence, with optional Science afterward. Section scores stay hidden until the end, when an estimated ACT Composite and section estimates are shown. If Science is taken, an estimated STEM score is also shown.</p>
     <div class="launch-actions"><button id="start-full-core" class="primary">Start full core ACT</button><button id="start-full-science">Start core + Science</button></div>
   </article>
   <div id="section-cards" class="grid"></div>
@@ -26,6 +26,7 @@
   <div class="practice-top"><button id="exit" class="link-button">End attempt</button><strong id="progress"></strong><span id="timer" class="timer"></span></div>
   <article id="passage-panel" class="passage" hidden>
     <div class="eyebrow" id="passage-meta"></div><h2 id="passage-title"></h2><p id="passage-text"></p>
+    <div id="passage-supplement" class="passage-supplement" hidden></div>
   </article>
   <article class="question"><p id="stem" class="stem"></p><div id="choices"></div></article>
   <div class="nav"><button id="prev">Previous</button><button id="next" class="primary">Next</button></div>
@@ -42,7 +43,7 @@
 </section>
 <section id="full-results" class="shell" hidden>
   <p class="eyebrow">Full practice result</p><h1>Estimated ACT Composite: <span id="full-composite"></span></h1>
-  <p class="lede">The combined range implied by the official practice-form conversions is <strong id="full-composite-range"></strong>. The Composite uses English, Mathematics, and Reading only; Science is reported separately when taken. These are unofficial practice estimates.</p>
+  <p class="lede">The combined range implied by the official practice-form conversions is <strong id="full-composite-range"></strong>. The Composite uses English, Mathematics, and Reading only. When Science is taken, its section estimate and an estimated Math+Science STEM score are reported separately. These are unofficial practice estimates.</p>
   <div id="full-section-results" class="results-box"></div><button id="full-home-again" class="primary">Back to sections</button>
 </section>
 </main>
