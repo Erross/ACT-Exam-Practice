@@ -43,9 +43,31 @@ const DR_SUPPLEMENTS = Object.freeze({
   }),
 });
 
+function browserDisplayText(id,text){
+  if(id==="S-DR-LEAF"){
+    return text
+      .replace(/\n\nLight intensity \(relative units\) \| Floating disks out of 10\n10 \| 1\n30 \| 4\n60 \| 8\n90 \| 9\n\n/,"\n\n")
+      .replace(/\n\nTemperature \(°C\) \| Floating disks out of 10\n10 \| 2\n20 \| 6\n30 \| 8\n40 \| 3\n\n/,"\n\n");
+  }
+  if(id==="S-DR-STREAM"){
+    return text.replace(/\n\nDay \| Rainfall \(mm\) \| Stream turbidity \(NTU\)\n1 \| 0 \| 3\n2 \| 4 \| 4\n3 \| 28 \| 21\n4 \| 6 \| 13\n5 \| 0 \| 6\n\n/,"\n\n");
+  }
+  if(id==="S-DR-SOLUBILITY"){
+    return text.replace(/\n\nTemperature \(°C\) \| KNO3 dissolved \(g per 100 g water\)\n10 \| 21\n20 \| 32\n30 \| 46\n40 \| 64\n50 \| 86\n\n/,"\n\n");
+  }
+  if(id==="S-DR-SOLAR"){
+    return text.replace(/\n\nPanel tilt \| Morning power \(W\) \| Noon power \(W\)\n0° \| 92 \| 181\n20° \| 126 \| 207\n40° \| 158 \| 221\n60° \| 174 \| 199\n\n/,"\n\n");
+  }
+  return text;
+}
+
 const repaired=applyScienceChoiceRepairs(RAW_SCIENCE_SETS);
 export const SCIENCE_SETS = Object.freeze(repaired.map(set=>{
   const supplement=DR_SUPPLEMENTS[set.id] || null;
   if(set.format==="DR" && !supplement) throw new Error(`Missing structured Data Representation display for ${set.id}`);
-  return Object.freeze({...set,supplement});
+  return Object.freeze({
+    ...set,
+    displayText:browserDisplayText(set.id,set.text),
+    supplement,
+  });
 }));
