@@ -5,6 +5,7 @@ import { GEOMETRY_QUESTIONS } from './math/geometry.js';
 import { STATISTICS_QUESTIONS } from './math/statistics.js';
 import { IES_QUESTIONS } from './math/integrating-essential-skills.js';
 import { MATH_DIFFICULTY_BY_FAMILY } from './math-difficulty.js';
+import { applyMathChoiceRepairs } from './math-choice-repairs.js';
 
 const RAW_MATH_QUESTIONS = [
   ...NUMBER_QUANTITY_QUESTIONS,
@@ -15,7 +16,8 @@ const RAW_MATH_QUESTIONS = [
   ...IES_QUESTIONS,
 ];
 
-export const MATH_QUESTIONS = Object.freeze(RAW_MATH_QUESTIONS.map(question=>{
+const repaired=applyMathChoiceRepairs(RAW_MATH_QUESTIONS);
+export const MATH_QUESTIONS = Object.freeze(repaired.map(question=>{
   const difficulty=MATH_DIFFICULTY_BY_FAMILY[question.variantGroup];
   if(!difficulty) throw new Error(`Missing reviewed Math difficulty for ${question.variantGroup}`);
   return Object.freeze({...question,difficulty});
