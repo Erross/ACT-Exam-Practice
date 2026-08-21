@@ -88,7 +88,8 @@ function renderHome() {
   for (const section of Object.values(SECTIONS)) {
     const card=document.createElement('article'); card.className='card';
     const available=section.status==='draft';
-    card.innerHTML=`<div class="eyebrow">${section.optional?'Optional section':'Core section'}</div><h2>${section.label}</h2><p>${section.totalItems} questions · ${section.minutes} minutes</p><p>${section.scoredItems} scored + ${section.fieldTestItems} embedded field-test items</p><button ${available?'':'disabled'}>${available?'Start draft practice':'Content in development'}</button>`;
+    const calculator=section.id==='math' ? '<p>Calculator permitted · online ACT includes Desmos</p>' : '';
+    card.innerHTML=`<div class="eyebrow">${section.optional?'Optional section':'Core section'}</div><h2>${section.label}</h2><p>${section.totalItems} questions · ${section.minutes} minutes</p><p>${section.scoredItems} scored + ${section.fieldTestItems} embedded field-test items</p>${calculator}<button ${available?'':'disabled'}>${available?'Start draft practice':'Content in development'}</button>`;
     if (available) card.querySelector('button').addEventListener('click',()=>startSection(section.id));
     cards.appendChild(card);
   }
@@ -164,6 +165,47 @@ function restoreSavedAttempt(){
   renderQuestion();
 }
 
+function buildTable(spec){
+  const wrap=document.createElement('div'); wrap.className='table-wrap';
+  const table=document.createElement('table');
+  if(spec.caption){ const caption=document.createElement('caption'); caption.textContent=spec.caption; table.appendChild(caption); }
+  const thead=document.createElement('thead'); const header=document.createElement('tr');
+  for(const name of spec.columns){ const th=document.createElement('th'); th.scope='col'; th.textContent=name; header.appendChild(th); }
+  thead.appendChild(header); table.appendChild(thead);
+  const tbody=document.createElement('tbody');
+  for(const row of spec.rows){
+    const tr=document.createElement('tr');
+    row.forEach((value,index)=>{
+      const cell=document.createElement(index===0?'th':'td');
+      if(index===0) cell.scope='row';
+      cell.textContent=value;
+      tr.appendChild(cell);
+    });
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody); wrap.appendChild(table); return wrap;
+}
+
+function renderSupplement(supplement){
+  const host=$('#passage-supplement'); host.innerHTML='';
+  if(!supplement){ host.hidden=true; return; }
+  const tables=supplement.type==='tables' ? supplement.tables : [supplement];
+  for(const spec of tables){
+    if(spec.type && spec.type!=='table') throw new Error(`Unsupported passage supplement ${spec.type}`);
+    host.appendChild(buildTable(spec));
+  }
+  host.hidden=false;
+}
+
+function passageDescriptor(q){
+  if(state.sectionId==='science') return `${q.passageGenre} science set`;
+  if(state.sectionId==='english'){
+    const domains={HUM:'humanities',SSC:'social science',NSC:'natural science'};
+    return `${q.passageWritingType} · ${domains[q.passageDomain]||q.passageDomain} passage`;
+  }
+  return `${q.passageGenre} passage`;
+}
+
 function renderQuestion() {
   const q=state.questions[state.index];
   $('#timer').textContent=formatTime(state.secondsLeft);
@@ -175,11 +217,12 @@ function renderQuestion() {
     $('#passage-title').textContent=q.passageTitle;
     const format=q.passageFormat && q.passageFormat!=='single' ? ` · ${q.passageFormat.toUpperCase()} format` : '';
     const engineering=state.sectionId==='science' && q.passageEngineeringDesign ? ' · engineering/design context' : '';
-    const descriptor=state.sectionId==='science' ? `${q.passageGenre} science set` : `${q.passageGenre} passage`;
-    $('#passage-meta').textContent=`${descriptor}${engineering}${format} · question ${q.passageQuestionNumber} of ${q.passageQuestionCount} in this set`;
+    $('#passage-meta').textContent=`${passageDescriptor(q)}${engineering}${format} · question ${q.passageQuestionNumber} of ${q.passageQuestionCount} in this set`;
     $('#passage-text').textContent=q.passageText;
+    renderSupplement(q.passageSupplement);
   } else {
     passage.hidden=true;
+    renderSupplement(null);
   }
   $('#stem').textContent=q.stem;
   const list=$('#choices'); list.innerHTML='';
@@ -233,6 +276,12 @@ function renderFullResults(){
     const range=result.low===result.high?`${result.low}`:`${result.low}–${result.high}`;
     const suffix=sectionId==='science'?' · not included in Composite':'';
     div.innerHTML=`<span>${SECTIONS[sectionId].label}${suffix}<br><small>Raw ${result.raw}/${result.maxRaw} · estimate range ${range}</small></span><strong>${result.estimate}</strong>`;
+    rows.appendChild(div);
+  }
+  if(summary.stem!==null){
+    const div=document.createElement('div'); div.className='result-row';
+    const range=summary.stemLow===summary.stemHigh?`${summary.stemLow}`:`${summary.stemLow}–${summary.stemHigh}`;
+    div.innerHTML=`<span>Estimated STEM<br><small>Average of Mathematics and Science · estimate range ${range}</small></span><strong>${summary.stem}</strong>`;
     rows.appendChild(div);
   }
 }
