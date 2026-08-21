@@ -17,15 +17,15 @@ function correctChoice(q){
   return index>=0 ? q.choices[index] : null;
 }
 
-function uniquelyLongestCorrect(questions){
-  const hits=[];
+function uniquelyLongestCorrectRate(questions){
+  let hits=0;
   for(const q of questions){
     const lengths=q.choices.map(c=>String(c).trim().length);
     const correctIndex="ABCD".indexOf(q.correct);
     const max=Math.max(...lengths);
-    if(lengths[correctIndex]===max && lengths.filter(n=>n===max).length===1) hits.push(q.id);
+    if(lengths[correctIndex]===max && lengths.filter(n=>n===max).length===1) hits++;
   }
-  return hits;
+  return hits/questions.length;
 }
 
 test("all browser-effective question IDs are globally unique and schemas remain sound",()=>{
@@ -50,14 +50,10 @@ test("all browser-effective question IDs are globally unique and schemas remain 
   assert.equal(total,391,"update this intentional bank-size checkpoint when adding reviewed content");
 });
 
-test("no section has a severe uniquely-longest-correct-answer tell",()=>{
+test("no section exceeds the release-style uniquely-longest-correct-answer ceiling",()=>{
   for(const [section,questions] of Object.entries(BANKS)){
-    const hits=uniquelyLongestCorrect(questions);
-    const rate=hits.length/questions.length;
+    const rate=uniquelyLongestCorrectRate(questions);
     console.log(`${section} uniquely-longest-correct rate: ${(rate*100).toFixed(1)}%`);
-    if((section==='reading' || section==='science') && rate>=0.30){
-      console.log(`${section} longest-correct ids: ${hits.join(', ')}`);
-    }
-    assert(rate<0.55,`${section} uniquely-longest-correct rate ${(rate*100).toFixed(1)}% is too high`);
+    assert(rate<0.30,`${section} uniquely-longest-correct rate ${(rate*100).toFixed(1)}% exceeds 30%`);
   }
 });
