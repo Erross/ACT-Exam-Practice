@@ -16,6 +16,7 @@ function attachScienceSet(set,scored,rng){
     passageText:set.text,
     passageGenre:set.domain,
     passageFormat:set.format,
+    passageSupplement:set.supplement || null,
     passageEngineeringDesign:Boolean(set.engineeringDesign),
     passageQuestionNumber:index+1,
     passageQuestionCount:set.questions.length,
