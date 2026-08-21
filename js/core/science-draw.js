@@ -16,6 +16,7 @@ function attachScienceSet(set,scored,rng){
     passageText:set.text,
     passageGenre:set.domain,
     passageFormat:set.format,
+    passageEngineeringDesign:Boolean(set.engineeringDesign),
     passageQuestionNumber:index+1,
     passageQuestionCount:set.questions.length,
   },rng));
@@ -29,29 +30,45 @@ function withinCategoryRanges(questions,blueprint){
   });
 }
 
+function withinCountRanges(items,keyFn,blueprint){
+  const counts=countBy(items,keyFn);
+  return Object.entries(blueprint).every(([key,[min,max]])=>{
+    const n=counts[key]||0;
+    return n>=min && n<=max;
+  });
+}
+
 function withinBackgroundKnowledgeRange(questions,range){
   const n=questions.filter(q=>q.backgroundKnowledge).length;
   return n>=range[0] && n<=range[1];
 }
 
-function exactCounts(items,keyFn,expected){
-  const counts=countBy(items,keyFn);
-  return Object.entries(expected).every(([key,value])=>(counts[key]||0)===value);
-}
-
-function exactFormatItemTotals(sets,expected){
+function withinFormatItemRanges(sets,ranges){
   const totals={};
   for(const set of sets) totals[set.format]=(totals[set.format]||0)+set.questions.length;
-  return Object.entries(expected).every(([key,value])=>(totals[key]||0)===value);
+  return Object.entries(ranges).every(([key,[min,max]])=>{
+    const n=totals[key]||0;
+    return n>=min && n<=max;
+  });
+}
+
+function withinEngineeringDesignRange(sets,range){
+  const n=sets.filter(set=>set.engineeringDesign).length;
+  return n>=range[0] && n<=range[1];
+}
+
+function withinTotalContentAreaMax(sets,maxima){
+  const counts=countBy(sets,set=>set.domain);
+  return Object.entries(maxima).every(([domain,max])=>(counts[domain]||0)<=max);
 }
 
 export function drawScienceSection(sets,sectionConfig,rng=Math.random){
-  const eligible=sets.filter(s=>Array.isArray(s.questions) && s.questions.length>=5 && s.questions.length<=6);
+  const eligible=sets.filter(s=>Array.isArray(s.questions) && s.questions.length>=5 && s.questions.length<=7);
   const formatBlueprint=sectionConfig.operationalFormatBlueprint;
   let operationalSets=null;
 
   // Randomized constrained search scales better than enumerating every six-set combination as the bank grows.
-  for(let attempt=0;attempt<2000 && !operationalSets;attempt++){
+  for(let attempt=0;attempt<4000 && !operationalSets;attempt++){
     const candidate=[];
     const used=new Set();
     for(const [format,count] of Object.entries(formatBlueprint)){
@@ -61,8 +78,9 @@ export function drawScienceSection(sets,sectionConfig,rng=Math.random){
       for(const set of chosen){ used.add(set.id); candidate.push(set); }
     }
     if(candidate.length!==6) continue;
-    if(!exactCounts(candidate,s=>s.domain,sectionConfig.operationalDomainBlueprint)) continue;
-    if(!exactFormatItemTotals(candidate,sectionConfig.operationalFormatItemTotals)) continue;
+    if(!withinCountRanges(candidate,s=>s.domain,sectionConfig.operationalContentAreaBlueprint)) continue;
+    if(!withinFormatItemRanges(candidate,sectionConfig.operationalFormatItemRanges)) continue;
+    if(!withinEngineeringDesignRange(candidate,sectionConfig.engineeringDesignPassageRange)) continue;
     const questions=candidate.flatMap(s=>s.questions);
     if(questions.length!==sectionConfig.scoredItems) continue;
     if(!withinCategoryRanges(questions,sectionConfig.operationalBlueprint)) continue;
@@ -72,8 +90,14 @@ export function drawScienceSection(sets,sectionConfig,rng=Math.random){
 
   if(!operationalSets) throw new Error("No valid Science operational set combination available");
   const usedIds=new Set(operationalSets.map(s=>s.id));
-  const fieldPool=eligible.filter(s=>!usedIds.has(s.id) && s.questions.length===sectionConfig.fieldTestItems);
-  if(!fieldPool.length) throw new Error("No six-item Science field-test set available");
+  const fieldPool=eligible.filter(set=>{
+    if(usedIds.has(set.id) || set.questions.length!==sectionConfig.fieldTestItems) return false;
+    return withinTotalContentAreaMax(
+      [...operationalSets,set],
+      sectionConfig.totalContentAreaMaxWithFieldTest,
+    );
+  });
+  if(!fieldPool.length) throw new Error("No six-item Science field-test set satisfies content-area maxima");
   const fieldSet=sample(fieldPool,1,rng)[0];
 
   const operationalQuestions=operationalSets.flatMap(s=>attachScienceSet(s,true,rng));
