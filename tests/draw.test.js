@@ -6,7 +6,9 @@ test("500 math draws satisfy scored blueprint and field-test count",()=>{
   const draw=drawMathSection(MATH_QUESTIONS,SECTIONS.math,mulberry32(seed));
   assert.equal(draw.length,45); assert.equal(draw.filter(q=>q.scored).length,41); assert.equal(draw.filter(q=>!q.scored).length,4);
   const scored=draw.filter(q=>q.scored); const counts=countBy(scored,q=>q.category);
-  assert.deepEqual(counts,{NQ:5,A:8,F:8,G:8,S:4,IES:8});
+  assert.deepEqual(counts,{NQ:5,A:7,F:8,G:8,S:5,IES:8});
+  assert.equal(counts.NQ+counts.A+counts.F+counts.G+counts.S,33);
+  assert.equal(counts.IES,8);
   assert(scored.filter(q=>q.modeling).length>=8);
   assert.equal(new Set(draw.map(q=>q.variantGroup)).size,45);
  }
