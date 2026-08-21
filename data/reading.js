@@ -4,6 +4,7 @@ import { READING_INFORMATIONAL_MULTI_PASSAGES } from './reading/informational-mu
 import { READING_EXPANSION_V1 } from './reading/expansion-v1.js';
 import { READING_TEXT_FIDELITY } from './reading-text-fidelity.js';
 import { applyReadingChoiceRepairs } from './reading-choice-repairs.js';
+import { applyReadingTellRepairs } from './reading-tell-repairs.js';
 import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
 
 const RAW_READING_PASSAGES = [
@@ -47,7 +48,7 @@ function browserDisplayText(id,text){
   return text;
 }
 
-const repaired=applyReadingChoiceRepairs(RAW_READING_PASSAGES);
+const repaired=applyReadingTellRepairs(applyReadingChoiceRepairs(RAW_READING_PASSAGES));
 const enriched=repaired.map(passage=>{
   const text=READING_TEXT_FIDELITY[passage.id];
   const supplement=VQI_SUPPLEMENTS[passage.id] || null;
