@@ -4,7 +4,7 @@ import { SECTIONS } from "../js/config.js";
 import { drawEnglishSection, countBy } from "../js/core/draw.js";
 import { mulberry32 } from "../js/core/random.js";
 
-function makePassage(id, length, genre) {
+function makePassage(id, length, writingType, domain) {
   const count = length === "long" ? 10 : 5;
   const categories = length === "long"
     ? ["POW","POW","POW","POW","KLA","KLA","CSE","CSE","CSE","CSE"]
@@ -14,7 +14,9 @@ function makePassage(id, length, genre) {
     title: `Passage ${id}`,
     text: `Original test fixture text for ${id}.`,
     length,
-    genre,
+    genre:writingType,
+    writingType,
+    domain,
     questions: Array.from({ length: count }, (_, i) => ({
       id: `${id}-Q${i+1}`,
       section: "english",
@@ -28,18 +30,18 @@ function makePassage(id, length, genre) {
 }
 
 const PASSAGES = [
-  makePassage("L1","long","informational"),
-  makePassage("L2","long","narrative"),
-  makePassage("L3","long","argumentative"),
-  makePassage("L4","long","informational"),
-  makePassage("L5","long","informational"),
-  makePassage("L6","long","informational"),
-  makePassage("S1","short","informational"),
-  makePassage("S2","short","argumentative"),
-  makePassage("S3","short","narrative"),
-  makePassage("S4","short","informational"),
-  makePassage("S5","short","argumentative"),
-  makePassage("S6","short","informational"),
+  makePassage("L1","long","informational","SSC"),
+  makePassage("L2","long","narrative","NSC"),
+  makePassage("L3","long","argumentative","NSC"),
+  makePassage("L4","long","informational","HUM"),
+  makePassage("L5","long","informational","HUM"),
+  makePassage("L6","long","informational","SSC"),
+  makePassage("S1","short","informational","NSC"),
+  makePassage("S2","short","argumentative","SSC"),
+  makePassage("S3","short","narrative","HUM"),
+  makePassage("S4","short","informational","NSC"),
+  makePassage("S5","short","argumentative","NSC"),
+  makePassage("S6","short","informational","SSC"),
 ];
 
 test("500 English draws preserve passage sets and final enhanced blueprint",()=>{
@@ -58,10 +60,13 @@ test("500 English draws preserve passage sets and final enhanced blueprint",()=>
     assert.equal(operationalIds.length,5);
     const operationalPassages=operationalIds.map(id=>PASSAGES.find(p=>p.id===id));
     assert.deepEqual(countBy(operationalPassages,p=>p.length),{long:3,short:2});
-    const writingTypes=countBy(operationalPassages,p=>p.genre);
+    const writingTypes=countBy(operationalPassages,p=>p.writingType);
     assert.equal(writingTypes.narrative,1);
     assert((writingTypes.informational||0)>=2 && (writingTypes.informational||0)<=3);
     assert((writingTypes.argumentative||0)>=1 && (writingTypes.argumentative||0)<=2);
+    const domains=countBy(operationalPassages,p=>p.domain);
+    assert(Object.values(domains).every(n=>n<=2),JSON.stringify(domains));
+    assert(scored.every(q=>q.passageWritingType && q.passageDomain));
     assert(passageIds.length===6 || passageIds.length===7);
 
     for(const id of passageIds) {
