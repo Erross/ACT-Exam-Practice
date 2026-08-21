@@ -10,6 +10,16 @@ function assertUniqueFamilies(items) {
   return true;
 }
 
+export function shuffleQuestionChoices(question, rng = Math.random) {
+  const sourceIndex = "ABCD".indexOf(question.correct);
+  if (sourceIndex < 0 || question.choices.length !== 4) throw new Error(`Invalid answer key for ${question.id}`);
+  const correctText = question.choices[sourceIndex];
+  const choices = shuffle(question.choices, rng);
+  const correctIndex = choices.indexOf(correctText);
+  if (correctIndex < 0) throw new Error(`Lost semantic answer while shuffling ${question.id}`);
+  return { ...question, choices, correct: "ABCD"[correctIndex] };
+}
+
 function sampleAvoidingFamilies(pool, count, usedFamilies, rng) {
   const candidates = shuffle(pool, rng);
   const picked = [];
@@ -57,7 +67,7 @@ export function drawMathSection(bank, sectionConfig, rng = Math.random) {
   const combined = [
     ...operational.map(q => ({ ...q, scored: true })),
     ...fieldTests.map(q => ({ ...q, scored: false })),
-  ];
+  ].map(q => shuffleQuestionChoices(q, rng));
   const result = shuffle(combined, rng);
   if (result.length !== sectionConfig.totalItems || !assertUniqueFamilies(result)) {
     throw new Error("Invalid final section draw");
@@ -73,8 +83,8 @@ function pickPassages(pool, count, usedIds, rng) {
   return picked;
 }
 
-function attachPassage(passage, scored) {
-  return passage.questions.map((q, index) => ({
+function attachPassage(passage, scored, rng) {
+  return passage.questions.map((q, index) => shuffleQuestionChoices({
     ...q,
     scored,
     passageId: passage.id,
@@ -83,7 +93,7 @@ function attachPassage(passage, scored) {
     passageLength: passage.length,
     passageGenre: passage.genre,
     passageQuestionNumber: index + 1,
-  }));
+  }, rng));
 }
 
 function assertRangeBlueprint(items, blueprint) {
@@ -106,7 +116,7 @@ export function drawEnglishSection(passages, sectionConfig, rng = Math.random) {
     ...pickPassages(longs, 3, usedIds, rng),
     ...pickPassages(shorts, 2, usedIds, rng),
   ];
-  const operational = operationalPassages.flatMap(p => attachPassage(p, true));
+  const operational = operationalPassages.flatMap(p => attachPassage(p, true, rng));
   if (operational.length !== sectionConfig.scoredItems) {
     throw new Error(`English operational draw has ${operational.length}; expected ${sectionConfig.scoredItems}`);
   }
@@ -127,7 +137,7 @@ export function drawEnglishSection(passages, sectionConfig, rng = Math.random) {
     ...operationalPassages.map(p => ({ passage: p, scored: true })),
     ...fieldPassages.map(p => ({ passage: p, scored: false })),
   ], rng);
-  const result = sets.flatMap(({ passage, scored }) => attachPassage(passage, scored));
+  const result = sets.flatMap(({ passage, scored }) => attachPassage(passage, scored, rng));
   if (result.length !== sectionConfig.totalItems) throw new Error("Invalid English final section draw");
   if (new Set(sets.map(s => s.passage.id)).size !== sets.length) throw new Error("English passage reused within section");
   return result;
