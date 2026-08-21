@@ -14,11 +14,12 @@ The current development build provides:
 - runnable timed practice for English, Mathematics, Reading, and optional Science;
 - full-test mode running English → Mathematics → Reading, with optional Science afterward;
 - scores hidden between sections during full-test mode;
+- saved-attempt recovery using an absolute deadline so refreshing does not reset section time;
 - estimated 1–36 section scores and an estimated ACT Composite after a complete core attempt;
 - estimated-score ranges derived from two official enhanced ACT practice-form conversion tables;
 - runtime answer-choice shuffling that preserves the semantic key;
 - constrained passage/set drawing so linked material remains intact;
-- automated blueprint, scoring, bank-integrity, and build tests, including repeated 500-draw blueprint checks.
+- automated blueprint, scoring, bank-integrity, answer-tell, retake-diversity, session, and build tests, including repeated 500-draw blueprint checks.
 
 ### Current draft bank size
 
@@ -27,10 +28,10 @@ The current development build provides:
 | English | 60 questions across 8 original passages | 50 |
 | Mathematics | 140 original questions across 70 variant families | 45 |
 | Reading | 54 questions across 6 original passages | 36 |
-| Science | 40 questions across 7 original science sets | 40 |
-| **Total** | **294 questions** | — |
+| Science | 80 questions across 14 original science sets | 40 |
+| **Total** | **334 questions** | — |
 
-These banks are **development drafts, not released banks**. English, Reading, and Science are currently close to minimum runnable scale and require substantial expansion before release. All four sections require independent clean-room content review and repair before promotion.
+These banks are **development drafts, not released banks**. Science has completed its first diversity expansion; English and Reading remain close to minimum runnable scale and require substantial expansion. All four sections still require independent clean-room content review and repair before promotion.
 
 ## Enhanced ACT structure modeled
 
@@ -43,7 +44,7 @@ These banks are **development drafts, not released banks**. English, Reading, an
 
 The Composite is based on English, Mathematics, and Reading. Science is optional and does not affect the Composite.
 
-The constrained engines also model the current enhanced passage/set structure: English uses 3 long + 2 short scored passage sets; Reading uses 3 scored + 1 EFT passage with literary/informational, length, and single/paired/VQI constraints; Science uses 2 Data Representation + 3 Research Summaries + 1 Conflicting Viewpoints scored sets plus one six-item EFT set, category ranges, domain balance, and the background-knowledge item range.
+The constrained engines also model the current enhanced passage/set structure: English uses 3 long + 2 short scored passage sets; Reading uses 3 scored + 1 EFT passage with literary/informational, length, and single/paired/VQI constraints; Science uses 2 Data Representation + 3 Research Summaries + 1 Conflicting Viewpoint scored sets plus one six-item EFT set, reporting-category ranges, primary content-area ranges, engineering/design as a secondary code, all-seven-passage content-area maxima, and the background-knowledge item range.
 
 ## Score estimates
 
