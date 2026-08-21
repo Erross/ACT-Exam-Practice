@@ -30,7 +30,7 @@ export const SECTIONS = Object.freeze({
   },
   science: {
     id: "science", label: "Science", totalItems: 40, scoredItems: 34, fieldTestItems: 6,
-    minutes: 40, status: "planned", optional: true,
+    minutes: 40, status: "draft", optional: true,
     operationalBlueprint: { IOD: [13,17], SIN: [6,11], EAM: [8,13] },
     // Fixed valid form within ACT's final enhanced passage ranges.
     operationalFormatBlueprint: { DR: 2, RS: 3, CV: 1 },
