@@ -18,11 +18,17 @@ export function summarizeFullTest(sectionResults){
   const coreIds=["english","math","reading"];
   const completedCore=coreIds.every(id=>Number.isFinite(sectionScores[id]));
   const coreResults=coreIds.map(id=>sectionResults[id]);
-  const hasRanges=completedCore && coreResults.every(r=>Number.isFinite(r?.low) && Number.isFinite(r?.high));
+  const hasCompositeRanges=completedCore && coreResults.every(r=>Number.isFinite(r?.low) && Number.isFinite(r?.high));
+  const hasStem=Number.isFinite(sectionScores.math) && Number.isFinite(sectionScores.science);
+  const stemResults=[sectionResults.math,sectionResults.science];
+  const hasStemRanges=hasStem && stemResults.every(r=>Number.isFinite(r?.low) && Number.isFinite(r?.high));
   return {
     composite: estimateComposite(sectionScores),
-    compositeLow: hasRanges ? roundedAverage(coreResults.map(r=>r.low)) : null,
-    compositeHigh: hasRanges ? roundedAverage(coreResults.map(r=>r.high)) : null,
+    compositeLow: hasCompositeRanges ? roundedAverage(coreResults.map(r=>r.low)) : null,
+    compositeHigh: hasCompositeRanges ? roundedAverage(coreResults.map(r=>r.high)) : null,
+    stem: hasStem ? roundedAverage([sectionScores.math,sectionScores.science]) : null,
+    stemLow: hasStemRanges ? roundedAverage(stemResults.map(r=>r.low)) : null,
+    stemHigh: hasStemRanges ? roundedAverage(stemResults.map(r=>r.high)) : null,
     sectionScores,
     completedCore,
     scienceIncluded:Number.isFinite(sectionScores.science),
