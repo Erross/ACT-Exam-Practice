@@ -14,7 +14,7 @@ function exactOverlap(a,b){
   return b.filter(q=>ids.has(q.id)).length;
 }
 
-function meanRetakeOverlap(drawFn,pairs=500){
+function meanRetakeOverlap(drawFn,pairs=5000){
   let sum=0;
   for(let i=1;i<=pairs;i++){
     const a=drawFn(mulberry32(i*2-1));
@@ -24,7 +24,7 @@ function meanRetakeOverlap(drawFn,pairs=500){
   return sum/pairs;
 }
 
-test("expanded ACT banks stay within measured retake-overlap ceilings",()=>{
+test("release-scale ACT banks stay at or below 40% mean exact-item retake overlap across 5,000 pairs",()=>{
   const values={
     math:meanRetakeOverlap(rng=>drawMathSection(MATH_QUESTIONS,SECTIONS.math,rng)),
     english:meanRetakeOverlap(rng=>drawEnglishSection(ENGLISH_PASSAGES,SECTIONS.english,rng)),
@@ -32,11 +32,7 @@ test("expanded ACT banks stay within measured retake-overlap ceilings",()=>{
     science:meanRetakeOverlap(rng=>drawScienceSection(SCIENCE_SETS,SECTIONS.science,rng)),
   };
   for(const [section,value] of Object.entries(values)){
-    console.log(`${section} mean retake exact-item overlap: ${value.toFixed(2)}/${SECTIONS[section].totalItems}`);
+    console.log(`${section} mean retake exact-item overlap across 5,000 pairs: ${value.toFixed(2)}/${SECTIONS[section].totalItems} (${(100*value/SECTIONS[section].totalItems).toFixed(1)}%)`);
+    assert(value<=SECTIONS[section].totalItems*0.40,`${section} retake overlap ${value.toFixed(2)} exceeds the 40% release target`);
   }
-  assert(values.math<=SECTIONS.math.totalItems*0.40,`math retake overlap ${values.math.toFixed(2)} exceeds the 40% release target`);
-  assert(values.english<=SECTIONS.english.totalItems*0.40,`english retake overlap ${values.english.toFixed(2)} exceeds the 40% release target`);
-  assert(values.reading<=SECTIONS.reading.totalItems*0.40,`reading retake overlap ${values.reading.toFixed(2)} exceeds the 40% release target`);
-  // Science remains on a temporary draft ceiling until its release-scale expansion lands.
-  assert(values.science<=SECTIONS.science.totalItems*0.60,`science retake overlap ${values.science.toFixed(2)} is too high`);
 });
