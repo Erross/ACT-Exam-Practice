@@ -1,4 +1,4 @@
-import { sample, shuffle } from "./random.js";
+import { shuffle } from "./random.js";
 
 function assertUniqueFamilies(items) {
   const seen = new Set();
@@ -62,6 +62,74 @@ export function drawMathSection(bank, sectionConfig, rng = Math.random) {
   if (result.length !== sectionConfig.totalItems || !assertUniqueFamilies(result)) {
     throw new Error("Invalid final section draw");
   }
+  return result;
+}
+
+function pickPassages(pool, count, usedIds, rng) {
+  const candidates = shuffle(pool.filter(p => !usedIds.has(p.id)), rng);
+  if (candidates.length < count) throw new Error(`Insufficient passage sets for requested draw of ${count}`);
+  const picked = candidates.slice(0, count);
+  for (const p of picked) usedIds.add(p.id);
+  return picked;
+}
+
+function attachPassage(passage, scored) {
+  return passage.questions.map((q, index) => ({
+    ...q,
+    scored,
+    passageId: passage.id,
+    passageTitle: passage.title,
+    passageText: passage.text,
+    passageLength: passage.length,
+    passageGenre: passage.genre,
+    passageQuestionNumber: index + 1,
+  }));
+}
+
+function assertRangeBlueprint(items, blueprint) {
+  const counts = countBy(items, q => q.category);
+  for (const [category, range] of Object.entries(blueprint)) {
+    const value = counts[category] || 0;
+    const [min, max] = range;
+    if (value < min || value > max) {
+      throw new Error(`${category} count ${value} is outside ${min}-${max}`);
+    }
+  }
+}
+
+export function drawEnglishSection(passages, sectionConfig, rng = Math.random) {
+  const usedIds = new Set();
+  const longs = passages.filter(p => p.length === "long" && p.questions.length === 10);
+  const shorts = passages.filter(p => p.length === "short" && p.questions.length === 5);
+
+  const operationalPassages = [
+    ...pickPassages(longs, 3, usedIds, rng),
+    ...pickPassages(shorts, 2, usedIds, rng),
+  ];
+  const operational = operationalPassages.flatMap(p => attachPassage(p, true));
+  if (operational.length !== sectionConfig.scoredItems) {
+    throw new Error(`English operational draw has ${operational.length}; expected ${sectionConfig.scoredItems}`);
+  }
+  assertRangeBlueprint(operational, sectionConfig.operationalBlueprint);
+
+  const remainingLongs = longs.filter(p => !usedIds.has(p.id));
+  const remainingShorts = shorts.filter(p => !usedIds.has(p.id));
+  const canLong = remainingLongs.length >= 1;
+  const canShort = remainingShorts.length >= 2;
+  if (!canLong && !canShort) throw new Error("Insufficient English passages for embedded field-test set");
+
+  const useLongFieldTest = canLong && (!canShort || rng() < 0.5);
+  const fieldPassages = useLongFieldTest
+    ? pickPassages(remainingLongs, 1, usedIds, rng)
+    : pickPassages(remainingShorts, 2, usedIds, rng);
+
+  const sets = shuffle([
+    ...operationalPassages.map(p => ({ passage: p, scored: true })),
+    ...fieldPassages.map(p => ({ passage: p, scored: false })),
+  ], rng);
+  const result = sets.flatMap(({ passage, scored }) => attachPassage(passage, scored));
+  if (result.length !== sectionConfig.totalItems) throw new Error("Invalid English final section draw");
+  if (new Set(sets.map(s => s.passage.id)).size !== sets.length) throw new Error("English passage reused within section");
   return result;
 }
 
