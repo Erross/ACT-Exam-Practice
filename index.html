@@ -10,7 +10,12 @@
 <section id="home" class="shell">
   <p class="eyebrow">Enhanced ACT · unofficial practice</p><h1>Practice the ACT under realistic section constraints.</h1>
   <p class="lede">Built around the current enhanced ACT structure, including embedded non-scored field-test items and an estimated 1–36 score grounded in official ACT practice-test conversion tables.</p>
-  <div class="notice"><strong>Development build:</strong> Mathematics, English, Reading, and optional Science are all available as draft practice sections. Full-test mode and release-level bank expansion/auditing remain in development.</div>
+  <div class="notice"><strong>Development build:</strong> Mathematics, English, Reading, and optional Science are all available as draft practice sections. Banks still require expansion and independent release-level auditing.</div>
+  <article class="full-launch">
+    <div class="eyebrow">Full-test mode</div><h2>Take a complete enhanced ACT practice attempt</h2>
+    <p>Run English → Mathematics → Reading in sequence, with optional Science afterward. Section scores stay hidden until the end, when an estimated ACT Composite and section estimates are shown.</p>
+    <div class="launch-actions"><button id="start-full-core" class="primary">Start full core ACT</button><button id="start-full-science">Start core + Science</button></div>
+  </article>
   <div id="section-cards" class="grid"></div>
 </section>
 <section id="practice" class="shell" hidden>
@@ -21,10 +26,20 @@
   <article class="question"><p id="stem" class="stem"></p><div id="choices"></div></article>
   <div class="nav"><button id="prev">Previous</button><button id="next" class="primary">Next</button></div>
 </section>
+<section id="between" class="shell" hidden>
+  <p class="eyebrow">Full ACT progress</p><h1><span id="completed-section"></span> complete.</h1>
+  <p class="lede">Your score remains hidden until the full attempt is finished. Next section: <strong id="next-section"></strong>.</p>
+  <div class="launch-actions"><button id="continue-full" class="primary">Continue to next section</button><button id="exit-full-between">End full test</button></div>
+</section>
 <section id="results" class="shell" hidden>
   <p class="eyebrow">Practice result</p><h1>Estimated <span id="result-section"></span> score: <span id="score-estimate"></span></h1>
   <p class="lede">Official practice-form conversions for this raw score span <strong id="score-range"></strong>. Your scored raw result was <strong id="raw-score"></strong>. This is an estimate, not an official ACT score.</p>
   <div id="category-results" class="results-box"></div><button id="home-again" class="primary">Back to sections</button>
+</section>
+<section id="full-results" class="shell" hidden>
+  <p class="eyebrow">Full practice result</p><h1>Estimated ACT Composite: <span id="full-composite"></span></h1>
+  <p class="lede">The combined range implied by the official practice-form conversions is <strong id="full-composite-range"></strong>. The Composite uses English, Mathematics, and Reading only; Science is reported separately when taken. These are unofficial practice estimates.</p>
+  <div id="full-section-results" class="results-box"></div><button id="full-home-again" class="primary">Back to sections</button>
 </section>
 </main>
 <footer>Independent educational practice resource. Not affiliated with or endorsed by ACT Education Corp.</footer>
