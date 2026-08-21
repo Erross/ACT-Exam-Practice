@@ -7,13 +7,13 @@ import { mulberry32 } from "../js/core/random.js";
 
 const validCategories=new Set(["KID","CS","IKI"]);
 
-test("expanded Reading bank has nine balanced original passage sets",()=>{
-  assert.equal(READING_PASSAGES.length,9);
-  assert.deepEqual(countBy(READING_PASSAGES,p=>p.genre),{literary:3,informational:6});
-  assert.equal(READING_PASSAGES.filter(p=>p.format==="single").length,6);
-  assert.equal(READING_PASSAGES.filter(p=>p.format==="paired" || p.format==="vqi").length,3);
-  assert.equal(READING_PASSAGES.filter(p=>String(p.length)==="750").length,6);
-  assert.equal(READING_PASSAGES.filter(p=>String(p.length)==="650").length,3);
+test("release-scale Reading bank has thirteen balanced original passage sets",()=>{
+  assert.equal(READING_PASSAGES.length,13);
+  assert.deepEqual(countBy(READING_PASSAGES,p=>p.genre),{literary:5,informational:8});
+  assert.equal(READING_PASSAGES.filter(p=>p.format==="single").length,9);
+  assert.equal(READING_PASSAGES.filter(p=>p.format==="paired" || p.format==="vqi").length,4);
+  assert.equal(READING_PASSAGES.filter(p=>String(p.length)==="750").length,9);
+  assert.equal(READING_PASSAGES.filter(p=>String(p.length)==="650").length,4);
   const ids=new Set(); const questionIds=new Set();
   for(const p of READING_PASSAGES){
     assert(!ids.has(p.id)); ids.add(p.id);
@@ -33,7 +33,7 @@ test("expanded Reading bank has nine balanced original passage sets",()=>{
       assert(q.rationale.length>=20);
     }
   }
-  assert.equal(questionIds.size,81);
+  assert.equal(questionIds.size,117);
 });
 
 test("500 Reading draws satisfy final enhanced passage and category blueprint",()=>{
