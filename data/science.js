@@ -5,6 +5,7 @@ import { SCIENCE_EXPANSION_DATA_REPRESENTATION_SETS } from './science/expansion-
 import { SCIENCE_EXPANSION_RESEARCH_SUMMARY_SETS } from './science/expansion-research-summaries.js';
 import { SCIENCE_EXPANSION_CONFLICTING_VIEWPOINT_SETS } from './science/expansion-conflicting-viewpoints.js';
 import { applyScienceChoiceRepairs } from './science-choice-repairs.js';
+import { applyScienceTellRepairs } from './science-tell-repairs.js';
 import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
 
 const RAW_SCIENCE_SETS = [
@@ -54,7 +55,7 @@ const DR_DISPLAY_TEXT = Object.freeze({
   "S-DR-SOLAR": `A design team tested one solar panel at four fixed tilt angles. The panel area, orientation toward south, electrical load, and measurement equipment were unchanged. Power output was recorded once in the morning and once near solar noon on a clear day.\n\nThe team wants to choose a fixed tilt for a device that must operate throughout the daylight period rather than only at noon.`,
 });
 
-const repaired=applyScienceChoiceRepairs(RAW_SCIENCE_SETS);
+const repaired=applyScienceTellRepairs(applyScienceChoiceRepairs(RAW_SCIENCE_SETS));
 const enriched=repaired.map(set=>{
   const supplement=DR_SUPPLEMENTS[set.id] || null;
   if(set.format==="DR" && !supplement) throw new Error(`Missing structured Data Representation display for ${set.id}`);
