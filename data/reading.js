@@ -4,6 +4,7 @@ import { READING_INFORMATIONAL_MULTI_PASSAGES } from './reading/informational-mu
 import { READING_EXPANSION_V1 } from './reading/expansion-v1.js';
 import { READING_TEXT_FIDELITY } from './reading-text-fidelity.js';
 import { applyReadingChoiceRepairs } from './reading-choice-repairs.js';
+import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
 
 const RAW_READING_PASSAGES = [
   ...READING_LITERARY_PASSAGES,
@@ -47,15 +48,17 @@ function browserDisplayText(id,text){
 }
 
 const repaired=applyReadingChoiceRepairs(RAW_READING_PASSAGES);
-export const READING_PASSAGES = Object.freeze(repaired.map(passage=>{
+const enriched=repaired.map(passage=>{
   const text=READING_TEXT_FIDELITY[passage.id];
   const supplement=VQI_SUPPLEMENTS[passage.id] || null;
   if(!text) throw new Error(`Missing ACT-length Reading text for ${passage.id}`);
   if(passage.format==="vqi" && !supplement) throw new Error(`Missing structured VQI supplement for ${passage.id}`);
-  return Object.freeze({
+  return {
     ...passage,
     text,
     displayText:browserDisplayText(passage.id,text),
     supplement,
-  });
-}));
+  };
+});
+
+export const READING_PASSAGES = Object.freeze(rebalanceGroupedQuestions(enriched).map(Object.freeze));
