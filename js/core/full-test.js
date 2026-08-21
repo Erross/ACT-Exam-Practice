@@ -6,15 +6,25 @@ export function buildFullTestQueue(includeScience=false){
     : ["english","math","reading"];
 }
 
+function roundedAverage(values){
+  return Math.round(values.reduce((a,b)=>a+b,0)/values.length);
+}
+
 export function summarizeFullTest(sectionResults){
   const sectionScores={};
   for(const [sectionId,result] of Object.entries(sectionResults)){
     if(result && Number.isFinite(result.estimate)) sectionScores[sectionId]=result.estimate;
   }
+  const coreIds=["english","math","reading"];
+  const completedCore=coreIds.every(id=>Number.isFinite(sectionScores[id]));
+  const coreResults=coreIds.map(id=>sectionResults[id]);
+  const hasRanges=completedCore && coreResults.every(r=>Number.isFinite(r?.low) && Number.isFinite(r?.high));
   return {
     composite: estimateComposite(sectionScores),
+    compositeLow: hasRanges ? roundedAverage(coreResults.map(r=>r.low)) : null,
+    compositeHigh: hasRanges ? roundedAverage(coreResults.map(r=>r.high)) : null,
     sectionScores,
-    completedCore:["english","math","reading"].every(id=>Number.isFinite(sectionScores[id])),
+    completedCore,
     scienceIncluded:Number.isFinite(sectionScores.science),
   };
 }
