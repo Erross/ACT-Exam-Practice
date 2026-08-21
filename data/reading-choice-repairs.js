@@ -16,6 +16,25 @@ export const READING_CHOICE_REPAIRS = Object.freeze({
   "R-LIT-NIGHTSHIFT-7": { choice:"C", text:"every bus line operated by Eli's company, including the schedules, transfer rules, and terminal procedures used throughout the system." },
   "R-LIT-NIGHTSHIFT-8": { choice:"A", text:"Dispatch announces that lane markers are covered and tells drivers that normal stopping rules have been suspended for the storm." },
   "R-LIT-NIGHTSHIFT-9": { choice:"D", text:"drivers should make transportation decisions for their passengers whenever weather or passenger mistakes make the printed schedule difficult to follow." },
+
+  "R-INFO-HEAT-1": { choice:"D", text:"should focus on emergency cooling centers rather than street design because short-term alerts reach residents more efficiently than permanent changes." },
+  "R-INFO-HEAT-2": { choice:"B", text:"Mature trees cannot cool air through evapotranspiration when they are planted beside paved streets or public transportation routes." },
+  "R-INFO-HEAT-3": { choice:"D", text:"People generally prefer darker pavement because reflected radiation from lighter surfaces makes pedestrian environments less comfortable overall." },
+  "R-INFO-HEAT-4": { choice:"D", text:"which tree species grow fastest in compacted soil and therefore should receive priority over other street-level cooling interventions." },
+  "R-INFO-HEAT-5": { choice:"B", text:"cities should stop collecting metropolitan temperature data because neighborhood observations provide a more complete picture of urban heat risk." },
+  "R-INFO-HEAT-6": { choice:"D", text:"argue that pedestrian thermal comfort cannot be studied reliably when reflective pavement changes both surface temperature and radiation." },
+  "R-INFO-HEAT-7": { choice:"A", text:"a chronological account of how city heat planning moved from emergency response to tree planting, pavement changes, and resident surveys." },
+  "R-INFO-HEAT-8": { choice:"A", text:"A project that lowers surface temperature should be prioritized over programs focused on access to cooling because measured heat reduction is the most reliable outcome." },
+  "R-INFO-HEAT-9": { choice:"B", text:"temperature measurements are too unreliable for planning because neighborhoods with similar readings can still contain different buildings and residents." },
+
+  "R-INFO-RESTORE-1": { choice:"A", text:"replaces most engineered flood protection with unrestricted river movement so channels and floodplains can return to their earlier physical patterns." },
+  "R-INFO-RESTORE-2": { choice:"B", text:"sediment carried onto floodplains generally remains suspended long enough to prevent meaningful deposition as water leaves the main channel." },
+  "R-INFO-RESTORE-3": { choice:"C", text:"It allows managers to defer defining acceptable erosion and habitat goals until after the restored river has adjusted to several floods." },
+  "R-INFO-RESTORE-4": { choice:"D", text:"a reason to reconstruct the original rigid channel whenever newly connected channels or gravel bars shift substantially after a flood." },
+  "R-INFO-RESTORE-5": { choice:"C", text:"increasing the width of each restored channel by a similar amount so floodwater spreads predictably regardless of surrounding land use." },
+  "R-INFO-RESTORE-6": { choice:"D", text:"restored rivers should be judged mainly by whether their appearance closely resembles rivers that have not recently been engineered." },
+  "R-INFO-RESTORE-8": { choice:"B", text:"Ecological goals should receive priority over infrastructure concerns when added habitat could compensate for impacts to bridges, fields, or trails." },
+  "R-INFO-RESTORE-9": { choice:"D", text:"River projects work best when managers avoid fixed numerical targets and rely instead on observed channel behavior after restoration." },
 });
 
 export function applyReadingChoiceRepairs(passages){
