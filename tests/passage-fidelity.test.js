@@ -25,6 +25,10 @@ function validateTable(spec,id,problems){
   }
 }
 
+function containsPipeTable(text){
+  return String(text).split(/\n/).some(line=>(line.match(/\|/g)||[]).length>=2);
+}
+
 test("English and Reading passages match final enhanced ACT length and metadata targets",()=>{
   const problems=[];
   const englishCounts=[];
@@ -43,6 +47,8 @@ test("English and Reading passages match final enhanced ACT length and metadata 
     if(passage.format==="vqi"){
       if(!passage.supplement) problems.push(`${passage.id}: VQI passage lacks structured supplement`);
       else validateTable(passage.supplement,passage.id,problems);
+      if(!passage.displayText || passage.displayText===passage.text) problems.push(`${passage.id}: VQI browser text must separate prose from structured data`);
+      if(containsPipeTable(passage.displayText)) problems.push(`${passage.id}: VQI browser text duplicates pipe-delimited table data`);
     }
   }
   console.log(`English passage word counts: ${englishCounts.join(", ")}`);
@@ -50,13 +56,15 @@ test("English and Reading passages match final enhanced ACT length and metadata 
   assert.deepEqual(problems,[],`Passage fidelity problems:\n${problems.join("\n")}`);
 });
 
-test("Science Data Representation sets expose structured data displays",()=>{
+test("Science Data Representation sets expose one structured browser data display",()=>{
   const problems=[];
   for(const set of SCIENCE_SETS.filter(set=>set.format==="DR")){
     if(!set.supplement){ problems.push(`${set.id}: missing structured Data Representation supplement`); continue; }
     const tables=set.supplement.type==="tables" ? set.supplement.tables : [set.supplement];
     if(!tables.length) problems.push(`${set.id}: empty structured supplement`);
     for(const table of tables) validateTable(table,set.id,problems);
+    if(!set.displayText || set.displayText===set.text) problems.push(`${set.id}: DR browser text must separate prose from structured data`);
+    if(containsPipeTable(set.displayText)) problems.push(`${set.id}: DR browser text duplicates pipe-delimited table data`);
   }
   assert.deepEqual(problems,[],`Science display problems:\n${problems.join("\n")}`);
 });
