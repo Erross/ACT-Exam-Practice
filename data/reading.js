@@ -2,6 +2,7 @@ import { READING_LITERARY_PASSAGES } from './reading/literary.js';
 import { READING_INFORMATIONAL_SINGLE_PASSAGES } from './reading/informational-single.js';
 import { READING_INFORMATIONAL_MULTI_PASSAGES } from './reading/informational-multi.js';
 import { READING_EXPANSION_V1 } from './reading/expansion-v1.js';
+import { READING_RELEASE_EXPANSION } from './reading/release-expansion.js';
 import { READING_TEXT_FIDELITY } from './reading-text-fidelity.js';
 import { applyReadingChoiceRepairs } from './reading-choice-repairs.js';
 import { applyReadingTellRepairs } from './reading-tell-repairs.js';
@@ -12,6 +13,7 @@ const RAW_READING_PASSAGES = [
   ...READING_INFORMATIONAL_SINGLE_PASSAGES,
   ...READING_INFORMATIONAL_MULTI_PASSAGES,
   ...READING_EXPANSION_V1,
+  ...READING_RELEASE_EXPANSION,
 ];
 
 const VQI_SUPPLEMENTS = Object.freeze({
@@ -50,7 +52,7 @@ function browserDisplayText(id,text){
 
 const repaired=applyReadingTellRepairs(applyReadingChoiceRepairs(RAW_READING_PASSAGES));
 const enriched=repaired.map(passage=>{
-  const text=READING_TEXT_FIDELITY[passage.id];
+  const text=READING_TEXT_FIDELITY[passage.id] || passage.text;
   const supplement=VQI_SUPPLEMENTS[passage.id] || null;
   if(!text) throw new Error(`Missing ACT-length Reading text for ${passage.id}`);
   if(passage.format==="vqi" && !supplement) throw new Error(`Missing structured VQI supplement for ${passage.id}`);
