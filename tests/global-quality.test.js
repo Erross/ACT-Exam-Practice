@@ -82,7 +82,7 @@ test("all browser-effective question IDs are globally unique and schemas remain 
       assert(q.rationale.trim().length>=20,`${q.id} rationale too short`);
     }
   }
-  assert.equal(total,391,"update this intentional bank-size checkpoint when adding reviewed content");
+  assert.equal(total,451,"update this intentional bank-size checkpoint when adding reviewed content");
 });
 
 test("browser-effective banks satisfy mature release-style statistical-tell gates",()=>{
