@@ -43,31 +43,24 @@ const DR_SUPPLEMENTS = Object.freeze({
   }),
 });
 
-function browserDisplayText(id,text){
-  if(id==="S-DR-LEAF"){
-    return text
-      .replace(/\n\nLight intensity \(relative units\) \| Floating disks out of 10\n10 \| 1\n30 \| 4\n60 \| 8\n90 \| 9\n\n/,"\n\n")
-      .replace(/\n\nTemperature \(°C\) \| Floating disks out of 10\n10 \| 2\n20 \| 6\n30 \| 8\n40 \| 3\n\n/,"\n\n");
-  }
-  if(id==="S-DR-STREAM"){
-    return text.replace(/\n\nDay \| Rainfall \(mm\) \| Stream turbidity \(NTU\)\n1 \| 0 \| 3\n2 \| 4 \| 4\n3 \| 28 \| 21\n4 \| 6 \| 13\n5 \| 0 \| 6\n\n/,"\n\n");
-  }
-  if(id==="S-DR-SOLUBILITY"){
-    return text.replace(/\n\nTemperature \(°C\) \| KNO3 dissolved \(g per 100 g water\)\n10 \| 21\n20 \| 32\n30 \| 46\n40 \| 64\n50 \| 86\n\n/,"\n\n");
-  }
-  if(id==="S-DR-SOLAR"){
-    return text.replace(/\n\nPanel tilt \| Morning power \(W\) \| Noon power \(W\)\n0° \| 92 \| 181\n20° \| 126 \| 207\n40° \| 158 \| 221\n60° \| 174 \| 199\n\n/,"\n\n");
-  }
-  return text;
-}
+// Browser prose is deliberately separate from the canonical source text for DR
+// sets. The source keeps the synthetic numeric data inline for auditability;
+// students see those values once, in the accessible structured table(s).
+const DR_DISPLAY_TEXT = Object.freeze({
+  "S-DR-LEAF": `Students placed equal numbers of spinach leaf disks in bicarbonate solution under four light intensities. As photosynthesis produced oxygen inside the disks, buoyant disks rose to the surface. After 12 minutes the students recorded the number of floating disks out of 10.\n\nA second trial used the same procedure at light intensity 60 but different solution temperatures.`,
+  "S-DR-STREAM": `A monitoring station measured daily rainfall and the turbidity of a stream. Turbidity is reported in nephelometric turbidity units (NTU); higher values indicate more suspended particles in the water.\n\nThe stream's long-term dry-weather turbidity at this station is approximately 3 NTU.`,
+  "S-DR-SOLUBILITY": `A student measured the maximum mass of potassium nitrate (KNO3) that dissolved in 100 g of water at several temperatures. A saturated solution contains the maximum amount that dissolves under the stated conditions.\n\nThe student used the same mass of water at every temperature and stirred each mixture for the same length of time before determining whether additional solid would dissolve.`,
+  "S-DR-SOLAR": `A design team tested one solar panel at four fixed tilt angles. The panel area, orientation toward south, electrical load, and measurement equipment were unchanged. Power output was recorded once in the morning and once near solar noon on a clear day.\n\nThe team wants to choose a fixed tilt for a device that must operate throughout the daylight period rather than only at noon.`,
+});
 
 const repaired=applyScienceChoiceRepairs(RAW_SCIENCE_SETS);
 export const SCIENCE_SETS = Object.freeze(repaired.map(set=>{
   const supplement=DR_SUPPLEMENTS[set.id] || null;
   if(set.format==="DR" && !supplement) throw new Error(`Missing structured Data Representation display for ${set.id}`);
+  if(set.format==="DR" && !DR_DISPLAY_TEXT[set.id]) throw new Error(`Missing browser prose for Data Representation set ${set.id}`);
   return Object.freeze({
     ...set,
-    displayText:browserDisplayText(set.id,set.text),
+    displayText:set.format==="DR" ? DR_DISPLAY_TEXT[set.id] : set.text,
     supplement,
   });
 }));
