@@ -29,6 +29,8 @@ function sectionBiasMetrics(questions){
   let distractorWords=0;
   const rawKeys={A:0,B:0,C:0,D:0};
   const absoluteStacked=[];
+  const uniqueLongestItems=[];
+  const conspicuousLengthGaps=[];
   const absolute=/\b(always|never|only|entirely|unlimited|impossible|guarantee(?:d|s)?|must)\b/i;
 
   for(const q of questions){
@@ -37,7 +39,15 @@ function sectionBiasMetrics(questions){
     const longest=Math.max(...lengths);
     const correctLength=lengths[correctIndex];
     if(correctLength===longest) amongLongest++;
-    if(correctLength===longest && lengths.filter(n=>n===longest).length===1) uniqueLongest++;
+    if(correctLength===longest && lengths.filter(n=>n===longest).length===1){
+      uniqueLongest++;
+      uniqueLongestItems.push(`${q.id}[${lengths.join("/")};${q.correct}]`);
+    }
+    const distractorLengths=lengths.filter((_,index)=>index!==correctIndex);
+    const distractorMean=distractorLengths.reduce((a,b)=>a+b,0)/distractorLengths.length;
+    if(correctLength-distractorMean>=3){
+      conspicuousLengthGaps.push(`${q.id}[${lengths.join("/")};${q.correct}]`);
+    }
     correctWords+=correctLength;
     rawKeys[q.correct]++;
 
@@ -60,6 +70,8 @@ function sectionBiasMetrics(questions){
     relativeMeanDelta:Math.abs(correctAverage-distractorAverage)/Math.max(1e-9,distractorAverage),
     rawKeys,
     absoluteStacked,
+    uniqueLongestItems,
+    conspicuousLengthGaps,
   };
 }
 
@@ -82,7 +94,7 @@ test("all browser-effective question IDs are globally unique and schemas remain 
       assert(q.rationale.trim().length>=20,`${q.id} rationale too short`);
     }
   }
-  assert.equal(total,451,"update this intentional bank-size checkpoint when adding reviewed content");
+  assert.equal(total,487,"update this intentional bank-size checkpoint when adding reviewed content");
 });
 
 test("browser-effective banks satisfy mature release-style statistical-tell gates",()=>{
@@ -92,13 +104,19 @@ test("browser-effective banks satisfy mature release-style statistical-tell gate
     const shares=Object.fromEntries(Object.entries(m.rawKeys).map(([key,n])=>[key,n/questions.length]));
     console.log(`${section}: unique-longest ${(100*m.uniqueLongestRate).toFixed(1)}%; among-longest ${(100*m.amongLongestRate).toFixed(1)}%; correct ${m.correctAverage.toFixed(2)} words vs distractors ${m.distractorAverage.toFixed(2)} (${(100*m.relativeMeanDelta).toFixed(1)}% delta); keys ${JSON.stringify(m.rawKeys)}`);
 
-    if(m.uniqueLongestRate>0.25) problems.push(`${section}: uniquely-longest correct ${(100*m.uniqueLongestRate).toFixed(1)}% > 25%`);
+    if(m.uniqueLongestRate>0.25){
+      problems.push(`${section}: uniquely-longest correct ${(100*m.uniqueLongestRate).toFixed(1)}% > 25%; items ${m.uniqueLongestItems.join(", ")}`);
+    }
     // The AP-style "correct among longest" word-count gate is not meaningful for
     // ACT Math because most options are one-token numbers or expressions, so ties
     // dominate the statistic. Math still must pass unique-longest, mean-length
     // parity, raw-key balance, and absolute-language gates below.
-    if(section!=="math" && m.amongLongestRate>0.58) problems.push(`${section}: correct among longest ${(100*m.amongLongestRate).toFixed(1)}% > 58%`);
-    if(m.relativeMeanDelta>0.12) problems.push(`${section}: correct/distractor mean word-length delta ${(100*m.relativeMeanDelta).toFixed(1)}% > 12%`);
+    if(section!=="math" && m.amongLongestRate>0.58){
+      problems.push(`${section}: correct among longest ${(100*m.amongLongestRate).toFixed(1)}% > 58%; uniquely-longest items ${m.uniqueLongestItems.join(", ")}`);
+    }
+    if(m.relativeMeanDelta>0.12){
+      problems.push(`${section}: correct/distractor mean word-length delta ${(100*m.relativeMeanDelta).toFixed(1)}% > 12%; conspicuous gaps ${m.conspicuousLengthGaps.join(", ")}`);
+    }
     for(const [key,share] of Object.entries(shares)){
       if(share<0.15 || share>0.35) problems.push(`${section}: raw key ${key} share ${(100*share).toFixed(1)}% outside 15-35%`);
     }
