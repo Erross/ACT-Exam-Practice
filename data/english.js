@@ -5,6 +5,7 @@ import { ENGLISH_SHORT_B } from './english/short-b.js';
 import { ENGLISH_EXPANSION_LONG } from './english/expansion-long.js';
 import { ENGLISH_EXPANSION_SHORT } from './english/expansion-short.js';
 import { ENGLISH_TEXT_FIDELITY } from './english-text-fidelity.js';
+import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
 
 const RAW_PASSAGES = [
   ...ENGLISH_LONG_A,
@@ -23,15 +24,17 @@ const CONTENT_DOMAIN_BY_ID = Object.freeze({
   "E-S1":"NSC", "E-S2":"SSC", "E-S3":"HUM", "E-S4":"NSC", "E-S5":"NSC", "E-S6":"SSC",
 });
 
-export const ENGLISH_PASSAGES = Object.freeze(RAW_PASSAGES.map(passage=>{
+const enriched=RAW_PASSAGES.map(passage=>{
   const domain=CONTENT_DOMAIN_BY_ID[passage.id];
   const text=ENGLISH_TEXT_FIDELITY[passage.id];
   if(!domain) throw new Error(`Missing English content-domain metadata for ${passage.id}`);
   if(!text) throw new Error(`Missing ACT-length English text for ${passage.id}`);
-  return Object.freeze({
+  return {
     ...passage,
     text,
     writingType: passage.genre,
     domain,
-  });
-}));
+  };
+});
+
+export const ENGLISH_PASSAGES = Object.freeze(rebalanceGroupedQuestions(enriched).map(Object.freeze));
