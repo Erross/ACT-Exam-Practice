@@ -4,11 +4,11 @@ import { ENGLISH_PASSAGES } from "../data/english.js";
 
 const validCategories=new Set(["POW","KLA","CSE"]);
 
-test("initial English bank is runnable at 4 long + 4 short passages",()=>{
-  assert.equal(ENGLISH_PASSAGES.length,8);
-  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="long").length,4);
-  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="short").length,4);
-  assert.equal(ENGLISH_PASSAGES.reduce((n,p)=>n+p.questions.length,0),60);
+test("expanded English bank has 6 long + 6 short passages",()=>{
+  assert.equal(ENGLISH_PASSAGES.length,12);
+  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="long").length,6);
+  assert.equal(ENGLISH_PASSAGES.filter(p=>p.length==="short").length,6);
+  assert.equal(ENGLISH_PASSAGES.reduce((n,p)=>n+p.questions.length,0),90);
 });
 
 test("English passage and question schema is internally consistent",()=>{
