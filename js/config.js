@@ -5,7 +5,9 @@ export const EXAM = Object.freeze({
   version: "enhanced-2026",
   compositeSections: ["english", "math", "reading"],
   optionalSections: ["science"],
+  stemSections: ["math", "science"],
   writingSupported: false,
+  officialSourcesVerified: "2026-08-21",
 });
 
 export const SECTIONS = Object.freeze({
@@ -15,24 +17,33 @@ export const SECTIONS = Object.freeze({
     operationalBlueprint: { POW: [15,17], KLA: [7,9], CSE: [15,17] },
     operationalPassageLengthBlueprint: { long: 3, short: 2 },
     operationalWritingTypeBlueprint: { informational: [2,3], argumentative: [1,2], narrative: [1,1] },
+    operationalDomainMax: 2,
+    passageWordRanges: { long: [300,380], short: [160,210] },
+    approximateOperationalWords: 1390,
   },
   math: {
     id: "math", label: "Mathematics", totalItems: 45, scoredItems: 41, fieldTestItems: 4,
-    minutes: 50, status: "draft",
+    minutes: 50, status: "draft", calculatorAllowed: true,
     // One valid fixed form inside ACT's final enhanced operational ranges:
     // PHM 33 = NQ 5 + Algebra 7 + Functions 8 + Geometry 8 + Statistics & Probability 5;
     // IES 8. Modeling overlaps these categories and must cover at least 8 operational items.
     operationalBlueprint: { NQ: 5, A: 7, F: 8, G: 8, S: 5, IES: 8 },
     modelingMinimum: 8,
+    difficultyOrder: ["easy", "medium", "hard"],
   },
   reading: {
     id: "reading", label: "Reading", totalItems: 36, scoredItems: 27, fieldTestItems: 9,
     minutes: 40, status: "draft",
     operationalBlueprint: { KID: [12,14], CS: [7,9], IKI: [5,7] },
+    operationalGenreBlueprint: { literary: 1, informational: 2 },
+    operationalFormatBlueprint: { single: 2, multi: 1 },
+    operationalLengthBlueprint: { "750": 2, "650": 1 },
+    passageWordRanges: { "750": [675,825], "650": [585,715] },
+    approximateOperationalWords: 2150,
   },
   science: {
     id: "science", label: "Science", totalItems: 40, scoredItems: 34, fieldTestItems: 6,
-    minutes: 40, status: "draft", optional: true,
+    minutes: 40, status: "draft", optional: true, calculatorAllowed: false,
     operationalBlueprint: { IOD: [13,17], SIN: [6,11], EAM: [8,13] },
     operationalFormatBlueprint: { DR: 2, RS: 3, CV: 1 },
     operationalFormatItemRanges: { DR: [10,12], RS: [16,20], CV: [6,7] },
