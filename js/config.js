@@ -32,6 +32,10 @@ export const SECTIONS = Object.freeze({
     id: "science", label: "Science", totalItems: 40, scoredItems: 34, fieldTestItems: 6,
     minutes: 40, status: "planned", optional: true,
     operationalBlueprint: { IOD: [13,17], SIN: [6,11], EAM: [8,13] },
+    // Fixed valid form within ACT's final enhanced passage ranges.
+    operationalFormatBlueprint: { DR: 2, RS: 3, CV: 1 },
+    operationalFormatItemTotals: { DR: 10, RS: 18, CV: 6 },
+    operationalDomainBlueprint: { life: 2, earth: 1, physics: 1, chemistry: 1, engineering: 1 },
   },
 });
 
