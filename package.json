@@ -1,0 +1,14 @@
+{
+  "name": "act-exam-practice",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Unofficial enhanced ACT practice application",
+  "scripts": {
+    "test": "node --test",
+    "build": "node tools/build.js",
+    "check": "npm test && npm run build"
+  },
+  "engines": { "node": ">=22" },
+  "license": "MIT"
+}

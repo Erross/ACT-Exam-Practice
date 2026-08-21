@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ACT Exam Practice</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header><a class="brand" href="./">ACT Exam Practice</a><a href="about.html">About</a></header>
+<main>
+<section id="home" class="shell">
+  <p class="eyebrow">Enhanced ACT · unofficial practice</p><h1>Practice the ACT under realistic section constraints.</h1>
+  <p class="lede">Built around the current enhanced ACT structure, including embedded non-scored field-test items and an estimated 1–36 score grounded in official ACT practice-test conversion tables.</p>
+  <div class="notice"><strong>Development build:</strong> Mathematics is the first working bank. English, Reading, Science, and full-test mode remain gated until their banks pass release review.</div>
+  <div id="section-cards" class="grid"></div>
+</section>
+<section id="practice" class="shell" hidden>
+  <div class="practice-top"><button id="exit" class="link-button">End attempt</button><strong id="progress"></strong><span id="timer" class="timer"></span></div>
+  <article class="question"><p id="stem" class="stem"></p><div id="choices"></div></article>
+  <div class="nav"><button id="prev">Previous</button><button id="next" class="primary">Next</button></div>
+</section>
+<section id="results" class="shell" hidden>
+  <p class="eyebrow">Practice result</p><h1>Estimated Math score: <span id="score-estimate"></span></h1>
+  <p class="lede">Official practice-form conversions for this raw score span <strong id="score-range"></strong>. Your scored raw result was <strong id="raw-score"></strong>. This is an estimate, not an official ACT score.</p>
+  <div id="category-results" class="results-box"></div><button id="home-again" class="primary">Back to sections</button>
+</section>
+</main>
+<footer>Independent educational practice resource. Not affiliated with or endorsed by ACT Education Corp.</footer>
+<script type="module" src="js/app.js"></script>
+</body></html>
