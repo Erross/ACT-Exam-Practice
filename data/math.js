@@ -4,12 +4,19 @@ import { FUNCTION_QUESTIONS } from './math/functions.js';
 import { GEOMETRY_QUESTIONS } from './math/geometry.js';
 import { STATISTICS_QUESTIONS } from './math/statistics.js';
 import { IES_QUESTIONS } from './math/integrating-essential-skills.js';
+import { MATH_DIFFICULTY_BY_FAMILY } from './math-difficulty.js';
 
-export const MATH_QUESTIONS = Object.freeze([
+const RAW_MATH_QUESTIONS = [
   ...NUMBER_QUANTITY_QUESTIONS,
   ...ALGEBRA_QUESTIONS,
   ...FUNCTION_QUESTIONS,
   ...GEOMETRY_QUESTIONS,
   ...STATISTICS_QUESTIONS,
   ...IES_QUESTIONS,
-]);
+];
+
+export const MATH_QUESTIONS = Object.freeze(RAW_MATH_QUESTIONS.map(question=>{
+  const difficulty=MATH_DIFFICULTY_BY_FAMILY[question.variantGroup];
+  if(!difficulty) throw new Error(`Missing reviewed Math difficulty for ${question.variantGroup}`);
+  return Object.freeze({...question,difficulty});
+}));
