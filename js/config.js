@@ -11,7 +11,7 @@ export const EXAM = Object.freeze({
 export const SECTIONS = Object.freeze({
   english: {
     id: "english", label: "English", totalItems: 50, scoredItems: 40, fieldTestItems: 10,
-    minutes: 35, status: "planned",
+    minutes: 35, status: "draft",
     operationalBlueprint: { POW: [15,17], KLA: [7,9], CSE: [15,17] },
   },
   math: {
@@ -35,11 +35,28 @@ export const SECTIONS = Object.freeze({
   },
 });
 
-export const MATH_CATEGORY_LABELS = Object.freeze({
-  NQ: "Number & Quantity",
-  A: "Algebra",
-  F: "Functions",
-  G: "Geometry",
-  S: "Statistics & Probability",
-  IES: "Integrating Essential Skills",
+export const CATEGORY_LABELS = Object.freeze({
+  english: Object.freeze({
+    POW: "Production of Writing",
+    KLA: "Knowledge of Language",
+    CSE: "Conventions of Standard English",
+  }),
+  math: Object.freeze({
+    NQ: "Number & Quantity",
+    A: "Algebra",
+    F: "Functions",
+    G: "Geometry",
+    S: "Statistics & Probability",
+    IES: "Integrating Essential Skills",
+  }),
+  reading: Object.freeze({
+    KID: "Key Ideas & Details",
+    CS: "Craft & Structure",
+    IKI: "Integration of Knowledge & Ideas",
+  }),
+  science: Object.freeze({
+    IOD: "Interpretation of Data",
+    SIN: "Scientific Investigation",
+    EAM: "Evaluating Scientific Arguments and Models with Evidence",
+  }),
 });
