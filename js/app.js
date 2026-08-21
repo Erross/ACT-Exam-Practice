@@ -47,7 +47,7 @@ function renderQuestion() {
   if(q.passageText){
     passage.hidden=false;
     $('#passage-title').textContent=q.passageTitle;
-    $('#passage-meta').textContent=`${q.passageGenre} passage · question ${q.passageQuestionNumber} of ${q.passageLength==='long'?10:5} in this set`;
+    $('#passage-meta').textContent=`${q.passageGenre} passage · question ${q.passageQuestionNumber} of ${q.passageQuestionCount} in this set`;
     $('#passage-text').textContent=q.passageText;
   } else {
     passage.hidden=true;
