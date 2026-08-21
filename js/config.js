@@ -13,6 +13,8 @@ export const SECTIONS = Object.freeze({
     id: "english", label: "English", totalItems: 50, scoredItems: 40, fieldTestItems: 10,
     minutes: 35, status: "draft",
     operationalBlueprint: { POW: [15,17], KLA: [7,9], CSE: [15,17] },
+    operationalPassageLengthBlueprint: { long: 3, short: 2 },
+    operationalWritingTypeBlueprint: { informational: [2,3], argumentative: [1,2], narrative: [1,1] },
   },
   math: {
     id: "math", label: "Mathematics", totalItems: 45, scoredItems: 41, fieldTestItems: 4,
