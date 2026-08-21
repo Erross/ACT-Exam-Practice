@@ -25,7 +25,7 @@ export const SECTIONS = Object.freeze({
   },
   reading: {
     id: "reading", label: "Reading", totalItems: 36, scoredItems: 27, fieldTestItems: 9,
-    minutes: 40, status: "planned",
+    minutes: 40, status: "draft",
     operationalBlueprint: { KID: [12,14], CS: [7,9], IKI: [5,7] },
   },
   science: {
