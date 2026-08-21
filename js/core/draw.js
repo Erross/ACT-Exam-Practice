@@ -92,7 +92,9 @@ function attachPassage(passage, scored, rng) {
     passageText: passage.text,
     passageLength: passage.length,
     passageGenre: passage.genre,
+    passageFormat: passage.format || "single",
     passageQuestionNumber: index + 1,
+    passageQuestionCount: passage.questions.length,
   }, rng));
 }
 
@@ -140,6 +142,47 @@ export function drawEnglishSection(passages, sectionConfig, rng = Math.random) {
   const result = sets.flatMap(({ passage, scored }) => attachPassage(passage, scored, rng));
   if (result.length !== sectionConfig.totalItems) throw new Error("Invalid English final section draw");
   if (new Set(sets.map(s => s.passage.id)).size !== sets.length) throw new Error("English passage reused within section");
+  return result;
+}
+
+function combinationsOfThree(items) {
+  const out=[];
+  for(let i=0;i<items.length-2;i++) for(let j=i+1;j<items.length-1;j++) for(let k=j+1;k<items.length;k++) out.push([items[i],items[j],items[k]]);
+  return out;
+}
+
+function isValidReadingOperationalSet(passages, blueprint) {
+  if(passages.length!==3 || passages.some(p=>p.questions.length!==9)) return false;
+  const genre=countBy(passages,p=>p.genre);
+  if((genre.literary||0)!==1 || (genre.informational||0)!==2) return false;
+  const format=countBy(passages,p=>p.format||"single");
+  if((format.single||0)!==2 || ((format.paired||0)+(format.vqi||0))!==1) return false;
+  const length=countBy(passages,p=>String(p.length));
+  if((length["750"]||0)!==2 || (length["650"]||0)!==1) return false;
+  const questions=passages.flatMap(p=>p.questions);
+  try { assertRangeBlueprint(questions,blueprint); } catch { return false; }
+  return true;
+}
+
+export function drawReadingSection(passages, sectionConfig, rng = Math.random) {
+  const eligible=passages.filter(p=>p.questions.length===9);
+  const validForms=combinationsOfThree(eligible).filter(combo=>isValidReadingOperationalSet(combo,sectionConfig.operationalBlueprint));
+  if(!validForms.length) throw new Error("No valid Reading operational passage combination available");
+  const operationalPassages=shuffle(validForms,rng)[0];
+  const used=new Set(operationalPassages.map(p=>p.id));
+  const fieldPool=eligible.filter(p=>!used.has(p.id));
+  if(!fieldPool.length) throw new Error("No Reading field-test passage available");
+  const fieldPassage=shuffle(fieldPool,rng)[0];
+  const operational=operationalPassages.flatMap(p=>attachPassage(p,true,rng));
+  if(operational.length!==sectionConfig.scoredItems) throw new Error("Invalid Reading operational item count");
+  assertRangeBlueprint(operational,sectionConfig.operationalBlueprint);
+  const sets=shuffle([
+    ...operationalPassages.map(p=>({passage:p,scored:true})),
+    {passage:fieldPassage,scored:false},
+  ],rng);
+  const result=sets.flatMap(({passage,scored})=>attachPassage(passage,scored,rng));
+  if(result.length!==sectionConfig.totalItems) throw new Error("Invalid Reading final section draw");
+  if(new Set(sets.map(s=>s.passage.id)).size!==4) throw new Error("Reading passage reused within section");
   return result;
 }
 
