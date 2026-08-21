@@ -36,7 +36,7 @@ test("expanded ACT banks stay within measured retake-overlap ceilings",()=>{
   }
   assert(values.math<=SECTIONS.math.totalItems*0.40,`math retake overlap ${values.math.toFixed(2)} exceeds the 40% release target`);
   assert(values.english<=SECTIONS.english.totalItems*0.40,`english retake overlap ${values.english.toFixed(2)} exceeds the 40% release target`);
-  // Reading and Science remain on temporary draft ceilings until their release-scale expansions land.
-  assert(values.reading<=SECTIONS.reading.totalItems*0.50,`reading retake overlap ${values.reading.toFixed(2)} is too high`);
+  assert(values.reading<=SECTIONS.reading.totalItems*0.40,`reading retake overlap ${values.reading.toFixed(2)} exceeds the 40% release target`);
+  // Science remains on a temporary draft ceiling until its release-scale expansion lands.
   assert(values.science<=SECTIONS.science.totalItems*0.60,`science retake overlap ${values.science.toFixed(2)} is too high`);
 });
