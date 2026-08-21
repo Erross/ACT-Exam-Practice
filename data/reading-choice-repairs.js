@@ -35,6 +35,27 @@ export const READING_CHOICE_REPAIRS = Object.freeze({
   "R-INFO-RESTORE-6": { choice:"D", text:"restored rivers should be judged mainly by whether their appearance closely resembles rivers that have not recently been engineered." },
   "R-INFO-RESTORE-8": { choice:"B", text:"Ecological goals should receive priority over infrastructure concerns when added habitat could compensate for impacts to bridges, fields, or trails." },
   "R-INFO-RESTORE-9": { choice:"D", text:"River projects work best when managers avoid fixed numerical targets and rely instead on observed channel behavior after restoration." },
+
+  "R-LIT-BACKDROP-3": { choice:"B", text:"They will use all four canvases in the theater's first reopened production after repairing every cracked fold line and recreating the original stage lighting." },
+  "R-LIT-BACKDROP-5": { choice:"C", text:"that the harbor scene was assembled by several unrelated painters whose noticeably different palettes can be distinguished only when the canvas is viewed close up." },
+  "R-LIT-BACKDROP-8": { choice:"D", text:"The harbor canvas is taller than Nora, demonstrating that the theater's designers valued unusually large scenery more than detailed planning or audience sight lines." },
+  "R-LIT-BACKDROP-9": { choice:"C", text:"proves that all four surviving backdrops were painted by Chen during the same production and were stored together immediately after that show's final performance." },
+
+  "R-INFO-DAYLIGHT-1": { choice:"B", text:"is primarily a historical-restoration technique intended to return buried streams to their exact predevelopment channels even when modern buildings occupy those routes." },
+  "R-INFO-DAYLIGHT-2": { choice:"D", text:"It removes the need for other drainage infrastructure because any open stream can carry unlimited storm flow once adjacent pavement has been replaced by vegetation." },
+  "R-INFO-DAYLIGHT-3": { choice:"C", text:"Designers are required to make restored channels straighter than the historical stream so water can leave dense neighborhoods before interacting with roads or utilities." },
+  "R-INFO-DAYLIGHT-4": { choice:"C", text:"Vegetated banks necessarily increase road salt and nutrient concentrations because plants transfer contaminants from nearby soil directly into the restored channel." },
+  "R-INFO-DAYLIGHT-5": { choice:"D", text:"parks, flood storage, and habitat can be assigned the same monetary value in every city, making their benefits straightforward to include in a construction bid." },
+  "R-INFO-DAYLIGHT-6": { choice:"D", text:"return a developed neighborhood to its exact predevelopment landscape by removing modern utilities, buildings, and property boundaries from the former stream corridor." },
+  "R-INFO-DAYLIGHT-7": { choice:"D", text:"a comparison between two named cities whose projects used the same historical maps, ecological surveys, utility records, and public-meeting process." },
+  "R-INFO-DAYLIGHT-8": { choice:"B", text:"Historical maps provide enough information to choose a daylighting site because utility conflicts, land ownership, storm flows, and community preferences can be addressed after construction." },
+  "R-INFO-DAYLIGHT-9": { choice:"C", text:"Community meetings can replace hydrologic modeling when residents have long experience with neighborhood flooding and can identify where every underground utility is located." },
+
+  "R-VQI-BIKESHARE-1": { choice:"B", text:"making every station contain exactly ten bicycles at all times, even when trip demand is strongly concentrated in one direction during commute periods." },
+  "R-VQI-BIKESHARE-3": { choice:"D", text:"Repeated forecasts eliminate the need to observe actual trips because a sufficiently frequent model update will always anticipate rain, train delays, and unusual rider behavior." },
+  "R-VQI-BIKESHARE-5": { choice:"B", text:"rider incentives consistently cost more than truck operations because each individual rider must receive a payment larger than the labor and vehicle cost of moving a bicycle." },
+  "R-VQI-BIKESHARE-6": { choice:"C", text:"repairing bicycles whose wheels are physically out of balance before those bicycles are returned to high-demand stations during the next commute period." },
+  "R-VQI-BIKESHARE-7": { choice:"B", text:"the visual appearance of equally filled stations, because a balanced-looking map is a more important operating goal than whether riders can find bikes or empty docks." },
 });
 
 export function applyReadingChoiceRepairs(passages){
