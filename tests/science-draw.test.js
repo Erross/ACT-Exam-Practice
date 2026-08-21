@@ -14,8 +14,9 @@ function assertRange(value,[min,max],label){
   assert(value>=min && value<=max,`${label} ${value} is outside ${min}-${max}`);
 }
 
-test("expanded draft Science bank has fourteen complete original sets and eighty questions",()=>{
-  assert.equal(SCIENCE_SETS.length,14);
+test("release-scale Science bank has twenty-four complete original sets and 137 questions",()=>{
+  assert.equal(SCIENCE_SETS.length,24);
+  assert.deepEqual(countBy(SCIENCE_SETS,set=>set.format),{DR:7,RS:12,CV:5});
   const ids=new Set(), questionIds=new Set();
   let total=0;
   for(const set of SCIENCE_SETS){
@@ -32,7 +33,7 @@ test("expanded draft Science bank has fourteen complete original sets and eighty
       assert.match(q.correct,/^[ABCD]$/); assert(q.rationale.length>=20);
     }
   }
-  assert.equal(total,80); assert.equal(questionIds.size,80);
+  assert.equal(total,137); assert.equal(questionIds.size,137);
 });
 
 test("500 Science draws satisfy final enhanced ACT passage, content-area, category, and knowledge ranges",()=>{
