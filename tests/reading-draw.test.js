@@ -54,6 +54,10 @@ test("500 Reading draws satisfy final enhanced passage and category blueprint",(
 
     const allIds=[...new Set(draw.map(q=>q.passageId))];
     assert.equal(allIds.length,4);
+    const allPassages=allIds.map(id=>READING_PASSAGES.find(p=>p.id===id));
+    const allFormats=countBy(allPassages,p=>p.format);
+    assert((allFormats.paired||0)<=1,"Reading form contains two paired units");
+    assert((allFormats.vqi||0)<=1,"Reading form contains two VQI units");
     for(const id of allIds){
       const rows=draw.filter(q=>q.passageId===id);
       assert.equal(rows.length,9);
