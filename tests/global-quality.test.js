@@ -17,15 +17,15 @@ function correctChoice(q){
   return index>=0 ? q.choices[index] : null;
 }
 
-function uniquelyLongestCorrectRate(questions){
-  let hits=0;
+function uniquelyLongestCorrect(questions){
+  const hits=[];
   for(const q of questions){
     const lengths=q.choices.map(c=>String(c).trim().length);
     const correctIndex="ABCD".indexOf(q.correct);
     const max=Math.max(...lengths);
-    if(lengths[correctIndex]===max && lengths.filter(n=>n===max).length===1) hits++;
+    if(lengths[correctIndex]===max && lengths.filter(n=>n===max).length===1) hits.push(q.id);
   }
-  return hits/questions.length;
+  return hits;
 }
 
 test("all browser-effective question IDs are globally unique and schemas remain sound",()=>{
@@ -52,8 +52,12 @@ test("all browser-effective question IDs are globally unique and schemas remain 
 
 test("no section has a severe uniquely-longest-correct-answer tell",()=>{
   for(const [section,questions] of Object.entries(BANKS)){
-    const rate=uniquelyLongestCorrectRate(questions);
+    const hits=uniquelyLongestCorrect(questions);
+    const rate=hits.length/questions.length;
     console.log(`${section} uniquely-longest-correct rate: ${(rate*100).toFixed(1)}%`);
+    if((section==='reading' || section==='science') && rate>=0.30){
+      console.log(`${section} longest-correct ids: ${hits.join(', ')}`);
+    }
     assert(rate<0.55,`${section} uniquely-longest-correct rate ${(rate*100).toFixed(1)}% is too high`);
   }
 });
