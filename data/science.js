@@ -5,6 +5,7 @@ import { SCIENCE_EXPANSION_DATA_REPRESENTATION_SETS } from './science/expansion-
 import { SCIENCE_EXPANSION_RESEARCH_SUMMARY_SETS } from './science/expansion-research-summaries.js';
 import { SCIENCE_EXPANSION_CONFLICTING_VIEWPOINT_SETS } from './science/expansion-conflicting-viewpoints.js';
 import { applyScienceChoiceRepairs } from './science-choice-repairs.js';
+import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
 
 const RAW_SCIENCE_SETS = [
   ...SCIENCE_DATA_REPRESENTATION_SETS,
@@ -54,13 +55,15 @@ const DR_DISPLAY_TEXT = Object.freeze({
 });
 
 const repaired=applyScienceChoiceRepairs(RAW_SCIENCE_SETS);
-export const SCIENCE_SETS = Object.freeze(repaired.map(set=>{
+const enriched=repaired.map(set=>{
   const supplement=DR_SUPPLEMENTS[set.id] || null;
   if(set.format==="DR" && !supplement) throw new Error(`Missing structured Data Representation display for ${set.id}`);
   if(set.format==="DR" && !DR_DISPLAY_TEXT[set.id]) throw new Error(`Missing browser prose for Data Representation set ${set.id}`);
-  return Object.freeze({
+  return {
     ...set,
     displayText:set.format==="DR" ? DR_DISPLAY_TEXT[set.id] : set.text,
     supplement,
-  });
-}));
+  };
+});
+
+export const SCIENCE_SETS = Object.freeze(rebalanceGroupedQuestions(enriched).map(Object.freeze));
