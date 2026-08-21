@@ -4,6 +4,7 @@ import { ENGLISH_SHORT_A } from './english/short-a.js';
 import { ENGLISH_SHORT_B } from './english/short-b.js';
 import { ENGLISH_EXPANSION_LONG } from './english/expansion-long.js';
 import { ENGLISH_EXPANSION_SHORT } from './english/expansion-short.js';
+import { ENGLISH_RELEASE_EXPANSION } from './english/release-expansion.js';
 import { ENGLISH_TEXT_FIDELITY } from './english-text-fidelity.js';
 import { applyEnglishChoiceRepairs } from './english-choice-repairs.js';
 import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
@@ -15,11 +16,13 @@ const RAW_PASSAGES = [
   ...ENGLISH_SHORT_B,
   ...ENGLISH_EXPANSION_LONG,
   ...ENGLISH_EXPANSION_SHORT,
+  ...ENGLISH_RELEASE_EXPANSION,
 ];
 
-// ACT treats writing type (informational/argumentative/narrative) separately from
-// subject/content genre. Preserve the legacy source `genre` as the writing type at
-// the aggregation boundary and attach an independent content-domain code.
+// Legacy passages receive reviewed metadata here. New release-scale passages may
+// carry their domain directly so future additions do not require another central
+// ID map. The fidelity overlay is likewise only for legacy texts that were expanded
+// after initial authoring; new passages must already meet the final word bands.
 const CONTENT_DOMAIN_BY_ID = Object.freeze({
   "E-L1":"SSC", "E-L2":"NSC", "E-L3":"NSC", "E-L4":"HUM", "E-L5":"HUM", "E-L6":"SSC",
   "E-S1":"NSC", "E-S2":"SSC", "E-S3":"HUM", "E-S4":"NSC", "E-S5":"NSC", "E-S6":"SSC",
@@ -27,8 +30,8 @@ const CONTENT_DOMAIN_BY_ID = Object.freeze({
 
 const repaired=applyEnglishChoiceRepairs(RAW_PASSAGES);
 const enriched=repaired.map(passage=>{
-  const domain=CONTENT_DOMAIN_BY_ID[passage.id];
-  const text=ENGLISH_TEXT_FIDELITY[passage.id];
+  const domain=passage.domain || CONTENT_DOMAIN_BY_ID[passage.id];
+  const text=ENGLISH_TEXT_FIDELITY[passage.id] || passage.text;
   if(!domain) throw new Error(`Missing English content-domain metadata for ${passage.id}`);
   if(!text) throw new Error(`Missing ACT-length English text for ${passage.id}`);
   return {
