@@ -29,6 +29,11 @@ function withinCategoryRanges(questions,blueprint){
   });
 }
 
+function withinBackgroundKnowledgeRange(questions,range){
+  const n=questions.filter(q=>q.backgroundKnowledge).length;
+  return n>=range[0] && n<=range[1];
+}
+
 function exactCounts(items,keyFn,expected){
   const counts=countBy(items,keyFn);
   return Object.entries(expected).every(([key,value])=>(counts[key]||0)===value);
@@ -61,6 +66,7 @@ export function drawScienceSection(sets,sectionConfig,rng=Math.random){
     const questions=candidate.flatMap(s=>s.questions);
     if(questions.length!==sectionConfig.scoredItems) continue;
     if(!withinCategoryRanges(questions,sectionConfig.operationalBlueprint)) continue;
+    if(!withinBackgroundKnowledgeRange(questions,sectionConfig.backgroundKnowledgeRange)) continue;
     operationalSets=candidate;
   }
 
@@ -75,6 +81,9 @@ export function drawScienceSection(sets,sectionConfig,rng=Math.random){
   for(const [category,[min,max]] of Object.entries(sectionConfig.operationalBlueprint)){
     const n=categoryCounts[category]||0;
     if(n<min || n>max) throw new Error(`${category} count ${n} is outside ${min}-${max}`);
+  }
+  if(!withinBackgroundKnowledgeRange(operationalQuestions,sectionConfig.backgroundKnowledgeRange)){
+    throw new Error("Science background-knowledge count is outside blueprint range");
   }
 
   const orderedSets=shuffle([
