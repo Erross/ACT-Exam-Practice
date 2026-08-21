@@ -7,6 +7,7 @@ import { SCIENCE_EXPANSION_CONFLICTING_VIEWPOINT_SETS } from './science/expansio
 import { SCIENCE_RELEASE_EXPANSION } from './science/release-expansion.js';
 import { applyScienceChoiceRepairs } from './science-choice-repairs.js';
 import { applyScienceTellRepairs } from './science-tell-repairs.js';
+import { applyScienceReleaseQualityRepairs } from './science-release-quality-repairs.js';
 import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
 
 const RAW_SCIENCE_SETS = [
@@ -78,7 +79,9 @@ const DR_DISPLAY_TEXT = Object.freeze({
   "S-DR-RECOVERY": `Two groups completed the same six-minute cycling protocol. Researchers recorded mean heart rate immediately after exercise and every two minutes during an eight-minute recovery period.\n\nThe groups differed in prior endurance training but followed the same exercise and measurement schedule.`,
 });
 
-const repaired=applyScienceTellRepairs(applyScienceChoiceRepairs(RAW_SCIENCE_SETS));
+const repaired=applyScienceReleaseQualityRepairs(
+  applyScienceTellRepairs(applyScienceChoiceRepairs(RAW_SCIENCE_SETS))
+);
 const enriched=repaired.map(set=>{
   const supplement=DR_SUPPLEMENTS[set.id] || null;
   if(set.format==="DR" && !supplement) throw new Error(`Missing structured Data Representation display for ${set.id}`);
