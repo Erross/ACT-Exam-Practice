@@ -174,8 +174,9 @@ function renderQuestion() {
     passage.hidden=false;
     $('#passage-title').textContent=q.passageTitle;
     const format=q.passageFormat && q.passageFormat!=='single' ? ` · ${q.passageFormat.toUpperCase()} format` : '';
+    const engineering=state.sectionId==='science' && q.passageEngineeringDesign ? ' · engineering/design context' : '';
     const descriptor=state.sectionId==='science' ? `${q.passageGenre} science set` : `${q.passageGenre} passage`;
-    $('#passage-meta').textContent=`${descriptor}${format} · question ${q.passageQuestionNumber} of ${q.passageQuestionCount} in this set`;
+    $('#passage-meta').textContent=`${descriptor}${engineering}${format} · question ${q.passageQuestionNumber} of ${q.passageQuestionCount} in this set`;
     $('#passage-text').textContent=q.passageText;
   } else {
     passage.hidden=true;
