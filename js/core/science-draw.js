@@ -13,7 +13,7 @@ function attachScienceSet(set,scored,rng){
     scored,
     passageId:set.id,
     passageTitle:set.title,
-    passageText:set.text,
+    passageText:set.displayText || set.text,
     passageGenre:set.domain,
     passageFormat:set.format,
     passageSupplement:set.supplement || null,
