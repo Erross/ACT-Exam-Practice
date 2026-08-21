@@ -4,7 +4,7 @@ import { SECTIONS } from "../js/config.js";
 import { drawEnglishSection, countBy } from "../js/core/draw.js";
 import { mulberry32 } from "../js/core/random.js";
 
-function makePassage(id, length) {
+function makePassage(id, length, genre) {
   const count = length === "long" ? 10 : 5;
   const categories = length === "long"
     ? ["POW","POW","POW","POW","KLA","KLA","CSE","CSE","CSE","CSE"]
@@ -14,7 +14,7 @@ function makePassage(id, length) {
     title: `Passage ${id}`,
     text: `Original test fixture text for ${id}.`,
     length,
-    genre: "informational",
+    genre,
     questions: Array.from({ length: count }, (_, i) => ({
       id: `${id}-Q${i+1}`,
       section: "english",
@@ -28,8 +28,18 @@ function makePassage(id, length) {
 }
 
 const PASSAGES = [
-  ...Array.from({length:5},(_,i)=>makePassage(`L${i+1}`,"long")),
-  ...Array.from({length:6},(_,i)=>makePassage(`S${i+1}`,"short")),
+  makePassage("L1","long","informational"),
+  makePassage("L2","long","narrative"),
+  makePassage("L3","long","argumentative"),
+  makePassage("L4","long","informational"),
+  makePassage("L5","long","informational"),
+  makePassage("L6","long","informational"),
+  makePassage("S1","short","informational"),
+  makePassage("S2","short","argumentative"),
+  makePassage("S3","short","narrative"),
+  makePassage("S4","short","informational"),
+  makePassage("S5","short","argumentative"),
+  makePassage("S6","short","informational"),
 ];
 
 test("500 English draws preserve passage sets and final enhanced blueprint",()=>{
@@ -47,8 +57,11 @@ test("500 English draws preserve passage sets and final enhanced blueprint",()=>
     const operationalIds=[...new Set(scored.map(q=>q.passageId))];
     assert.equal(operationalIds.length,5);
     const operationalPassages=operationalIds.map(id=>PASSAGES.find(p=>p.id===id));
-    assert.equal(operationalPassages.filter(p=>p.length==="long").length,3);
-    assert.equal(operationalPassages.filter(p=>p.length==="short").length,2);
+    assert.deepEqual(countBy(operationalPassages,p=>p.length),{long:3,short:2});
+    const writingTypes=countBy(operationalPassages,p=>p.genre);
+    assert.equal(writingTypes.narrative,1);
+    assert((writingTypes.informational||0)>=2 && (writingTypes.informational||0)<=3);
+    assert((writingTypes.argumentative||0)>=1 && (writingTypes.argumentative||0)<=2);
     assert(passageIds.length===6 || passageIds.length===7);
 
     for(const id of passageIds) {
