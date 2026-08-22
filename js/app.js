@@ -1,11 +1,11 @@
-import { SECTIONS, CATEGORY_LABELS } from "./config.js";
+import { SECTIONS, CATEGORY_LABELS, isSectionAvailable } from "./config.js";
 import { MATH_QUESTIONS } from "../data/math.js";
 import { ENGLISH_PASSAGES } from "../data/english.js";
 import { READING_PASSAGES } from "../data/reading.js";
 import { SCIENCE_SETS } from "../data/science.js";
 import { drawMathSection, drawEnglishSection, drawReadingSection } from "./core/draw.js";
 import { drawScienceSection } from "./core/science-draw.js";
-import { buildFullTestQueue, summarizeFullTest } from "./core/full-test.js";
+import { buildFullTestQueue, fullTestCommitment, fullTestTransition, summarizeFullTest } from "./core/full-test.js";
 import { mulberry32 } from "./core/random.js";
 import { scoreResponses } from "./core/scoring.js";
 import { attemptStatus, buildAnswerReview, answerText } from "./core/attempt-review.js";
@@ -91,12 +91,12 @@ function renderHome() {
   hideAllViews();
   $('#home').hidden=false;
   const cards=$('#section-cards'); cards.innerHTML='';
-  for (const section of Object.values(SECTIONS)) {
+  for(const section of Object.values(SECTIONS)){
     const card=document.createElement('article'); card.className='card';
-    const available=section.status==='draft';
+    const available=isSectionAvailable(section);
     const calculator=section.id==='math' ? '<p>Calculator permitted · online ACT includes Desmos</p>' : '<p>No calculator for this section</p>';
-    card.innerHTML=`<div class="eyebrow">${section.optional?'Optional section':'Core section'}</div><h2>${section.label}</h2><p>${section.totalItems} questions · ${section.minutes} minutes</p><p>${section.scoredItems} scored + ${section.fieldTestItems} embedded field-test items</p>${calculator}<button ${available?'':'disabled'}>${available?'Review details & start':'Content in development'}</button>`;
-    if (available) card.querySelector('button').addEventListener('click',()=>startSection(section.id));
+    card.innerHTML=`<div class="eyebrow">${section.optional?'Optional section':'Composite section'}</div><h2>${section.label}</h2><p>${section.totalItems} questions · ${section.minutes} minutes</p><p>${section.scoredItems} scored + ${section.fieldTestItems} embedded field-test items</p>${calculator}<button ${available?'':'disabled'}>${available?'Review details & start':'Content in development'}</button>`;
+    if(available) card.querySelector('button').addEventListener('click',()=>startSection(section.id));
     cards.appendChild(card);
   }
   updateResumeCard();
@@ -120,20 +120,26 @@ function showPreflight(sectionId){
   state.preflightSectionId=sectionId;
   hideAllViews(); $('#preflight').hidden=false;
   $('#preflight-mode').textContent=state.mode==='full'
-    ? `Full ACT · Section ${state.fullIndex+1} of ${state.fullQueue.length}`
+    ? `Full ACT practice · Section ${state.fullIndex+1} of ${state.fullQueue.length}`
     : 'Individual section practice';
   $('#preflight-title').textContent=`${section.label} preflight`;
   $('#preflight-summary').textContent=`${section.totalItems} questions · ${section.minutes} minutes · ${section.scoredItems} scored + ${section.fieldTestItems} embedded non-scored field-test items.`;
   const rules=$('#preflight-rules'); rules.innerHTML='';
+  if(state.mode==='full' && state.fullIndex===0){
+    const includeScience=state.fullQueue.includes('science');
+    const commitment=fullTestCommitment(SECTIONS,includeScience);
+    appendRule(`This full attempt contains ${commitment.questions} displayed questions across ${commitment.minutes} timed minutes${includeScience?', including optional Science':''}. ACT Writing is not included.`);
+    appendRule('For realistic standard-time practice, the scheduled break is after Mathematics. This app leaves the break student-controlled and does not run a break timer.');
+  }
   appendRule('The section timer does not start on this screen. It begins when you press “Begin section and start timer.”');
   appendRule(sectionId==='math'
-    ? 'A permitted calculator may be used on Mathematics; the online ACT includes Desmos. The practice questions are designed for the current four-choice Math format.'
+    ? 'A permitted calculator may be used on Mathematics; the online ACT includes Desmos. The practice questions use the current four-choice Math format.'
     : 'A calculator is not permitted for this section.');
   appendRule('Use the question navigator to move within the current section. Flag questions for review and return to them before submitting.');
   appendRule('Submitting ends the section. If questions are unanswered or flagged, the app warns you before submission.');
   appendRule('Embedded field-test items are mixed into the section and do not count toward the scored raw result. They are identified only after submission.');
   appendRule('Any 1–36 section score, Composite, or STEM score shown here is an unofficial estimate based on published official practice-form conversions.');
-  if(state.mode==='full') appendRule('Full-test section scores stay hidden until the entire attempt ends. After leaving a completed section, you cannot return to it. ACT Writing is not included in this practice app.');
+  if(state.mode==='full') appendRule('Full-test section scores stay hidden until the entire attempt ends. After leaving a completed section, you cannot return to it.');
   $('#preflight-title').focus();
 }
 
@@ -148,7 +154,7 @@ function startTimer(){
   if(state.secondsLeft) state.timer=setInterval(tick,1000);
 }
 
-function beginSection(sectionId) {
+function beginSection(sectionId){
   const section=SECTIONS[sectionId];
   const seed=(Date.now() ^ Math.floor(Math.random()*0xffffffff))>>>0;
   state.questions=drawForSection(sectionId,mulberry32(seed));
@@ -164,7 +170,7 @@ function beginSection(sectionId) {
   renderQuestion(true);
 }
 
-function startSection(sectionId) {
+function startSection(sectionId){
   clearSession();
   state.mode='section'; state.fullQueue=[]; state.fullResults={}; state.fullIndex=0;
   showPreflight(sectionId);
@@ -187,10 +193,7 @@ function restoreSavedAttempt(){
   state.questions=saved.questions; state.responses=saved.responses; state.flags=saved.flags; state.index=saved.index;
   state.startedAt=saved.startedAt || null; state.deadlineAt=saved.deadlineAt || null;
   state.fullQueue=saved.fullQueue || []; state.fullIndex=saved.fullIndex || 0; state.fullResults=saved.fullResults || {};
-  if(state.phase==='between'){
-    renderBetweenSections();
-    return;
-  }
+  if(state.phase==='between'){ renderBetweenSections(); return; }
   state.secondsLeft=remainingSeconds(saved);
   hideAllViews(); $('#practice').hidden=false;
   if(!state.secondsLeft){ finishSection(true); return; }
@@ -263,7 +266,7 @@ function renderNavigator(){
   $('#attempt-status').textContent=`${status.answered}/${status.total} answered · ${status.flagged} flagged`;
 }
 
-function renderQuestion(focus=false) {
+function renderQuestion(focus=false){
   const q=state.questions[state.index];
   $('#timer').textContent=formatTime(state.secondsLeft);
   const fullPrefix=state.mode==='full' ? `Full ACT · ${state.fullIndex+1}/${state.fullQueue.length} sections · ` : '';
@@ -345,9 +348,12 @@ function renderBetweenSections(){
   persistSession();
   hideAllViews(); $('#between').hidden=false;
   $('#completed-section').textContent=SECTIONS[state.sectionId].label;
-  const nextId=state.fullQueue[state.fullIndex+1]; const next=SECTIONS[nextId];
+  const nextId=state.fullQueue[state.fullIndex+1];
+  const next=SECTIONS[nextId];
+  const transition=fullTestTransition(state.sectionId,nextId);
   $('#next-section').textContent=next.label;
-  $('#next-section-detail').textContent=`${next.totalItems} questions · ${next.minutes} minutes · ${nextId==='math'?'calculator permitted':'no calculator'}. The timer starts when you press “Begin next section.”`;
+  $('#next-section-detail').textContent=`${transition.heading}. ${transition.guidance} ${next.totalItems} questions · ${next.minutes} minutes · ${nextId==='math'?'calculator permitted':'no calculator'}.`;
+  $('#continue-full').textContent=nextId==='science'?'Begin optional Science':`Begin ${next.label}`;
 }
 
 function renderFullResults(){
@@ -372,7 +378,7 @@ function renderFullResults(){
   if(summary.stem!==null){
     const div=document.createElement('div'); div.className='result-row';
     const range=summary.stemLow===summary.stemHigh?`${summary.stemLow}`:`${summary.stemLow}–${summary.stemHigh}`;
-    const label=document.createElement('span'); label.textContent=`Estimated STEM — average of Mathematics and Science · estimate range ${range}`;
+    const label=document.createElement('span'); label.textContent=`Estimated STEM — average of Mathematics and Science · observed practice-form range ${range}`;
     const score=document.createElement('strong'); score.textContent=String(summary.stem);
     div.append(label,score); rows.appendChild(div);
   }
@@ -385,7 +391,7 @@ function renderFullResults(){
   }
 }
 
-function finishSection(timedOut=false) {
+function finishSection(timedOut=false){
   clearInterval(state.timer);
   const result={
     ...scoreResponses(state.questions,state.responses,state.sectionId),
