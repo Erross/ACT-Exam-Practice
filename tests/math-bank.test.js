@@ -14,3 +14,10 @@ test("answer positions are not conspicuously imbalanced",()=>{
  const c={A:0,B:0,C:0,D:0}; for(const q of MATH_QUESTIONS)c[q.correct]++;
  for(const n of Object.values(c)) assert(n>=20 && n<=50,JSON.stringify(c));
 });
+test("wall-rate item asks explicitly for wall-equivalent area rather than an impossible fraction of one wall",()=>{
+ const q=MATH_QUESTIONS.find(row=>row.id==="M-IES-WORK-2");
+ assert(q);
+ assert.match(q.stem,/standard-wall equivalents of area/i);
+ assert.equal(q.choices["ABCD".indexOf(q.correct)],"3/2");
+ assert.match(q.rationale,/3\/2 standard-wall equivalents/i);
+});
