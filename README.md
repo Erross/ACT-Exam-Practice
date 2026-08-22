@@ -1,28 +1,27 @@
 # ACT Exam Practice
 
-A free, original, unofficial practice application for the **enhanced ACT**. The project is built with a neutral exam/section architecture so its core concepts can later be shared with `Erross/AP-Exam-Practice` without making ACT content depend on AP-specific assumptions.
+A free, original, unofficial practice application for the **enhanced ACT**. The core architecture is exam/section-neutral so it can remain compatible with `Erross/AP-Exam-Practice` concepts without making ACT content depend on AP-specific assumptions.
 
-## Current development status
+## V1 release
 
-`main` remains intentionally minimal until the first release passes its complete release gate. Active development is on `feature/v1-foundation` through draft PR #1.
+V1 provides:
 
-The current candidate provides:
-
-- static HTML/CSS/JavaScript suitable for GitHub Pages;
-- runnable timed English, Mathematics, Reading, and optional Science practice;
+- static HTML/CSS/JavaScript deployed through GitHub Pages;
+- timed English, Mathematics, Reading, and optional Science practice;
 - full-test mode: English → Mathematics → Reading, with optional Science afterward;
-- preflight before the timer starts;
+- preflight before the timer starts, including calculator/guessing/score guidance;
 - question navigator with answered/current/flagged state;
 - saved-attempt recovery using an absolute deadline, including flags and full-test between-section state;
-- explicit submission with unanswered/flagged review warning and automatic timeout submission;
+- protection against silently overwriting a saved attempt when starting a new one;
+- explicit submission with unanswered/flagged warnings and automatic timeout submission;
 - section scores hidden between full-test sections;
 - answer review with the actual displayed choice order and rationales;
 - estimated 1–36 section scores, estimated ACT Composite, and estimated STEM when Science is taken;
 - score ranges derived from two current official enhanced-ACT online-practice conversion tables;
 - runtime answer-choice shuffling with semantic-key preservation;
 - constrained whole-passage/set drawing and embedded non-scored field-test handling;
-- production-scale automated evidence: 5,000 valid forms per section and 5,000 independent retake pairs per section;
-- build and production-artifact verification.
+- 5,000-form blueprint and 5,000-pair retake-diversity release evidence;
+- build/production-artifact verification and automated GitHub Pages deployment.
 
 ### Browser-effective bank size
 
@@ -34,7 +33,7 @@ The current candidate provides:
 | Science | 137 questions across 24 science sets | 40 |
 | **Total** | **544 questions** | — |
 
-These banks are still **release candidates, not released banks**. Their scale, automated quality, diversity, blueprint, scoring, session, build, and artifact gates are green, but independent clean-room content review and fresh naive-user review remain release blockers.
+All four section banks are marked **released** in the V1 configuration. Their complete pre-production evidence is recorded in [`RELEASE_EVIDENCE_V1.md`](RELEASE_EVIDENCE_V1.md).
 
 ## Enhanced ACT structure modeled
 
@@ -53,9 +52,7 @@ See [`OFFICIAL_ACT_SOURCES.md`](OFFICIAL_ACT_SOURCES.md) for the authoritative s
 
 ## Release-scale evidence
 
-The current automated evidence is recorded in [`RELEASE_EVIDENCE_V1.md`](RELEASE_EVIDENCE_V1.md).
-
-The audited production banks passed **5,000/5,000 forms per section**. Mean exact-item overlap across **5,000 independent retake pairs per section** was:
+The production banks passed **5,000/5,000 forms per section**. Mean exact-item overlap across **5,000 independent retake pairs per section** was:
 
 | Section | Mean overlap |
 | --- | ---: |
@@ -66,7 +63,9 @@ The audited production banks passed **5,000/5,000 forms per section**. Mean exac
 
 Project release target is ≤40% for each section.
 
-The browser-effective answer-construction gates are also green: unique-longest-correct, prose correct-among-longest, correct-vs-distractor mean length, raw key balance, and stacked absolute-language checks.
+Browser-effective answer-construction gates are green: unique-longest-correct, prose correct-among-longest, correct-vs-distractor mean length, raw key balance, and stacked absolute-language checks.
+
+A complete clean-room audit of the 544-question effective bank identified and repaired substantive ambiguity/direction/duplicate issues, with regressions added. A fresh reset pass over the repaired effective artifact reached **zero new substantive findings**. The production-artifact naive UX pass also produced a coordinated set of release fixes covering saved-attempt protection, calculator wording, guessing guidance, timeout feedback, submit wording, release-facing copy, accessibility, and desktop passage layout.
 
 ## Estimated scores
 
@@ -92,17 +91,7 @@ The build outputs `_site/` for GitHub Pages. `npm run check` includes source tes
 
 ## Release process
 
-The governing quality rules are in [`CONTENT_STANDARDS.md`](CONTENT_STANDARDS.md) and the complete V1 gate is in [`ACT_RELEASE_CHECKLIST.md`](ACT_RELEASE_CHECKLIST.md).
-
-Passing CI is necessary but not sufficient. Before promotion, the candidate still requires:
-
-1. independent clean-room review of the entire browser-effective bank;
-2. independent recomputation/fact checking and ambiguity review;
-3. repair of any substantive findings;
-4. a fresh from-scratch clean-room pass with zero substantive findings;
-5. a fresh naive-user/accessibility review of the production artifact;
-6. exact prospective-production-tree validation;
-7. successful GitHub Pages deployment and public smoke test.
+The governing quality rules are in [`CONTENT_STANDARDS.md`](CONTENT_STANDARDS.md) and the reusable V1 gate is in [`ACT_RELEASE_CHECKLIST.md`](ACT_RELEASE_CHECKLIST.md). Point-in-time release results are kept in [`RELEASE_EVIDENCE_V1.md`](RELEASE_EVIDENCE_V1.md).
 
 ## Copyright and affiliation
 
