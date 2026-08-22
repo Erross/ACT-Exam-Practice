@@ -1,10 +1,28 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildFullTestQueue, summarizeFullTest } from "../js/core/full-test.js";
+import { buildFullTestQueue, fullTestCommitment, fullTestTransition, summarizeFullTest } from "../js/core/full-test.js";
+import { SECTIONS } from "../js/config.js";
 
-test("full ACT queue includes core sections in official Composite order",()=>{
+test("full ACT queue includes Composite sections in official order",()=>{
   assert.deepEqual(buildFullTestQueue(false),["english","math","reading"]);
   assert.deepEqual(buildFullTestQueue(true),["english","math","reading","science"]);
+});
+
+test("full-test launch reports the complete displayed-question and timed-minute commitment",()=>{
+  assert.deepEqual(fullTestCommitment(SECTIONS,false),{questions:131,minutes:125});
+  assert.deepEqual(fullTestCommitment(SECTIONS,true),{questions:171,minutes:165});
+});
+
+test("only Mathematics to Reading is labeled as the scheduled standard-time break",()=>{
+  const afterEnglish=fullTestTransition("english","math");
+  const afterMath=fullTestTransition("math","reading");
+  const beforeScience=fullTestTransition("reading","science");
+  assert.equal(afterEnglish.kind,"section-transition");
+  assert.match(afterEnglish.guidance,/not the scheduled ACT break/i);
+  assert.equal(afterMath.kind,"scheduled-break");
+  assert.match(afterMath.guidance,/up to 15 minutes/i);
+  assert.equal(beforeScience.kind,"optional-transition");
+  assert.match(beforeScience.guidance,/optional/i);
 });
 
 test("full ACT summary computes form-consistent Composite and STEM estimates",()=>{
@@ -39,7 +57,7 @@ test("Composite range never mixes different official practice forms",()=>{
   assert.equal(summary.compositeHigh,11);
 });
 
-test("full ACT summary withholds Composite until all core sections exist",()=>{
+test("full ACT summary withholds Composite until all Composite sections exist",()=>{
   const summary=summarizeFullTest({english:{estimate:30,byForm:{form1:30,form2:30}},math:{estimate:27,byForm:{form1:27,form2:27}}});
   assert.equal(summary.composite,null);
   assert.equal(summary.compositeLow,null);
@@ -50,7 +68,7 @@ test("full ACT summary withholds Composite until all core sections exist",()=>{
   assert.equal(summary.completedCore,false);
 });
 
-test("core-only full ACT has no STEM estimate",()=>{
+test("English-Math-Reading-only full ACT has no STEM estimate",()=>{
   const summary=summarizeFullTest({
     english:{estimate:25,byForm:{form1:25,form2:25}},
     math:{estimate:26,byForm:{form1:26,form2:26}},
