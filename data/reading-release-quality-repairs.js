@@ -14,7 +14,7 @@ export const READING_RELEASE_QUALITY_REPAIRS = Object.freeze({
   "R-LIT-KILN-3": {choice:"B",text:"The upper shelf reached a higher maximum temperature than the kiln center even though the thermocouple was positioned elsewhere."},
   "R-LIT-KILN-4": {choice:"B",text:"He learns that ceramic glaze generally should not be heated twice because another firing can alter the surface unpredictably."},
   "R-LIT-KILN-5": {choice:"B",text:"Luis quickly forgets what the witness cone showed because he is more interested in finishing another firing before the birthday."},
-  "R-LIT-KILN-6": {choice:"B",text:"suggest that the changing blue-and-brown surfaces resemble outdoor patterns she finds visually appealing on the finished bowls."},
+  "R-LIT-KILN-6": {choice:"B",text:"claim that the blue-and-brown pattern was the exact weather effect Luis had intended to paint before the bowls entered the kiln."},
   "R-LIT-KILN-7": {choice:"B",text:"make another birthday gift; instead, he decides to study the firing process before making additional ceramic pieces."},
   "R-LIT-KILN-8": {choice:"B",text:"Luis's mother has kept an elementary-school pinch pot for years despite its uneven shape, rough surface, and obvious imperfections."},
   "R-LIT-KILN-9": {choice:"B",text:"evidence that handmade objects can remain meaningful even when the original plan changes during the production process."},
