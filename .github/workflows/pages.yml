@@ -1,3 +1,4 @@
+# V1 production deployment: build and publish only the checked _site artifact.
 name: Deploy to GitHub Pages
 
 on:
