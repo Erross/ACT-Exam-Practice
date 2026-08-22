@@ -40,10 +40,11 @@ test("sea-breeze background-knowledge item has only one defensible heat-capacity
   const question=SCIENCE_SETS.flatMap(set=>set.questions).find(q=>q.id==="S-CV-SEABREEZE-6");
   assert(question,"missing S-CV-SEABREEZE-6");
   const correctIndex="ABCD".indexOf(question.correct);
-  assert.match(question.choices[correctIndex],/high heat capacity/i);
-  question.choices.forEach((choice,index)=>{
-    if(index!==correctIndex) assert.doesNotMatch(choice,/higher heat capacity than water/i);
-  });
+  const correct=question.choices[correctIndex];
+  const distractors=question.choices.filter((_,index)=>index!==correctIndex).join(" ");
+  assert.match(correct,/water.*high heat capacity|high heat capacity.*water/i);
+  assert.match(distractors,/soil and rock have a higher heat capacity than water/i);
+  assert.doesNotMatch(distractors,/transfer relatively little solar energy downward compared with the mixing/i);
 });
 
 test("500 Science draws satisfy final enhanced ACT passage, content-area, category, and knowledge ranges",()=>{
