@@ -3,33 +3,34 @@ export const OFFICIAL_PRACTICE_CONVERSIONS = Object.freeze({"form1":{"english":[
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
 export function estimateSectionScore(sectionId, rawScore) {
-  const tables = Object.values(OFFICIAL_PRACTICE_CONVERSIONS).map(f => f[sectionId]);
-  if (!tables.length || !tables[0]) throw new Error(`No scoring model for ${sectionId}`);
-  const maxRaw = tables[0].length - 1;
-  const raw = clamp(Math.round(rawScore), 0, maxRaw);
-  const values = tables.map(t => t[raw]);
-  const estimate = Math.round(values.reduce((a,b) => a+b, 0) / values.length);
-  return { raw, maxRaw, estimate, low: Math.min(...values), high: Math.max(...values) };
+  const entries=Object.entries(OFFICIAL_PRACTICE_CONVERSIONS);
+  if(!entries.length || !entries[0][1][sectionId]) throw new Error(`No scoring model for ${sectionId}`);
+  const maxRaw=entries[0][1][sectionId].length-1;
+  const raw=clamp(Math.round(rawScore),0,maxRaw);
+  const byForm=Object.fromEntries(entries.map(([form,tables])=>[form,tables[sectionId][raw]]));
+  const values=Object.values(byForm);
+  const estimate=Math.round(values.reduce((a,b)=>a+b,0)/values.length);
+  return {raw,maxRaw,estimate,low:Math.min(...values),high:Math.max(...values),byForm};
 }
 
 export function estimateComposite(sectionScores) {
-  const ids = ["english", "math", "reading"];
-  const vals = ids.map(id => sectionScores[id]).filter(Number.isFinite);
-  if (vals.length !== 3) return null;
-  return Math.round(vals.reduce((a,b) => a+b,0) / 3);
+  const ids=["english","math","reading"];
+  const vals=ids.map(id=>sectionScores[id]).filter(Number.isFinite);
+  if(vals.length!==3) return null;
+  return Math.round(vals.reduce((a,b)=>a+b,0)/3);
 }
 
-export function scoreResponses(questions, responses, sectionId) {
-  const scored = questions.filter(q => q.scored !== false);
-  let raw = 0;
-  const categories = {};
-  for (const q of scored) {
-    categories[q.category] ||= { correct: 0, total: 0 };
+export function scoreResponses(questions,responses,sectionId) {
+  const scored=questions.filter(q=>q.scored!==false);
+  let raw=0;
+  const categories={};
+  for(const q of scored){
+    categories[q.category] ||= {correct:0,total:0};
     categories[q.category].total++;
-    if (responses[q.id] === q.correct) {
+    if(responses[q.id]===q.correct){
       raw++;
       categories[q.category].correct++;
     }
   }
-  return { ...estimateSectionScore(sectionId, raw), categories, totalDisplayed: questions.length };
+  return {...estimateSectionScore(sectionId,raw),categories,totalDisplayed:questions.length};
 }
