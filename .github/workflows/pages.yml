@@ -1,5 +1,5 @@
 # V1 production deployment: build and publish only the checked _site artifact.
-# One-time repository setup: Settings -> Pages -> Build and deployment -> Source = GitHub Actions.
+# One-time repository setup completed: Settings -> Pages -> Build and deployment -> Source = GitHub Actions.
 name: Deploy to GitHub Pages
 
 on:
