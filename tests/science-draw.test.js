@@ -36,6 +36,16 @@ test("release-scale Science bank has twenty-four complete original sets and 137 
   assert.equal(total,137); assert.equal(questionIds.size,137);
 });
 
+test("sea-breeze background-knowledge item has only one defensible heat-capacity explanation",()=>{
+  const question=SCIENCE_SETS.flatMap(set=>set.questions).find(q=>q.id==="S-CV-SEABREEZE-6");
+  assert(question,"missing S-CV-SEABREEZE-6");
+  const correctIndex="ABCD".indexOf(question.correct);
+  assert.match(question.choices[correctIndex],/high heat capacity/i);
+  question.choices.forEach((choice,index)=>{
+    if(index!==correctIndex) assert.doesNotMatch(choice,/higher heat capacity than water/i);
+  });
+});
+
 test("500 Science draws satisfy final enhanced ACT passage, content-area, category, and knowledge ranges",()=>{
   for(let seed=1;seed<=500;seed++){
     const draw=drawScienceSection(SCIENCE_SETS,SECTIONS.science,mulberry32(seed));
