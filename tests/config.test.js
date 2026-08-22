@@ -10,6 +10,10 @@ test("enhanced ACT section counts and timing",()=>{
   assert.deepEqual(EXAM.compositeSections,["english","math","reading"]);
 });
 
+test("V1 production sections are explicitly released",()=>{
+  assert.deepEqual(Object.values(SECTIONS).map(section=>section.status),["released","released","released","released"]);
+});
+
 test("draft and released sections remain launchable while planned sections do not",()=>{
   assert.equal(isSectionAvailable({status:"draft"}),true);
   assert.equal(isSectionAvailable({status:"released"}),true);
