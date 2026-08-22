@@ -6,6 +6,7 @@ import { ENGLISH_EXPANSION_LONG } from './english/expansion-long.js';
 import { ENGLISH_EXPANSION_SHORT } from './english/expansion-short.js';
 import { ENGLISH_RELEASE_EXPANSION } from './english/release-expansion.js';
 import { ENGLISH_TEXT_FIDELITY } from './english-text-fidelity.js';
+import { applyEnglishStemRepairs } from './english-stem-repairs.js';
 import { applyEnglishChoiceRepairs } from './english-choice-repairs.js';
 import { applyEnglishReleaseQualityRepairs } from './english-release-quality-repairs.js';
 import { rebalanceGroupedQuestions } from './choice-position-normalizer.js';
@@ -29,7 +30,9 @@ const CONTENT_DOMAIN_BY_ID = Object.freeze({
   "E-S1":"NSC", "E-S2":"SSC", "E-S3":"HUM", "E-S4":"NSC", "E-S5":"NSC", "E-S6":"SSC",
 });
 
-const repaired=applyEnglishReleaseQualityRepairs(applyEnglishChoiceRepairs(RAW_PASSAGES));
+const repaired=applyEnglishReleaseQualityRepairs(
+  applyEnglishChoiceRepairs(applyEnglishStemRepairs(RAW_PASSAGES))
+);
 const enriched=repaired.map(passage=>{
   const domain=passage.domain || CONTENT_DOMAIN_BY_ID[passage.id];
   const text=ENGLISH_TEXT_FIDELITY[passage.id] || passage.text;
