@@ -19,8 +19,11 @@ This is the governing source for final enhanced-ACT operational blueprints, pass
   https://www.act.org/content/act/en/products-and-services/the-act/test-day/calculator-policy.html
 - **Understanding ACT scores**  
   https://www.act.org/content/act/en/products-and-services/the-act/scores/understanding-your-scores.html
-- **Enhanced ACT FAQ**  
+- **Enhanced ACT K-12 guidance / FAQs**  
+  https://www.act.org/content/act/en/products-and-services/the-act-educator/the-act-test/enhancements-k12.html  
   https://www.act.org/content/act/en/products-and-services/the-act-educator/the-act-test/enhancements-k12/faqs.html
+- **Official enhanced ACT online practice tests and scoring keys**  
+  https://www.act.org/content/act/en/products-and-services/the-act/test-preparation/free-act-test-prep/act-online-test-sample-questions.html
 
 ## Verified implementation snapshot
 
@@ -31,7 +34,7 @@ This is the governing source for final enhanced-ACT operational blueprints, pass
 | Reading | 36 | 27 | 9 | 40 min |
 | Science (optional) | 40 | 34 | 6 | 40 min |
 
-The ACT Composite uses English, Mathematics, and Reading. Science is optional and does not enter the Composite. When Science is taken, ACT also reports a STEM score derived from Mathematics and Science.
+The ACT Composite uses English, Mathematics, and Reading. Science is optional in the modeled enhanced format and does not enter the Composite. When Science is taken, ACT also reports a STEM score derived from Mathematics and Science.
 
 ### English
 
@@ -61,7 +64,8 @@ The ACT Composite uses English, Mathematics, and Reading. Science is optional an
 
 ### Science
 
-- Reporting categories: Interpretation of Data 13–17; Scientific Investigation 6–11; Evaluation of Models, Inferences, and Experimental Results 8–13.
+- Reporting categories: Interpretation of Data 13–17; Scientific Investigation 6–11; **Evaluating Scientific Arguments and Models with Evidence** 8–13.
+- The February 2026 Design Framework explicitly notes that the legacy **Evaluation of Models, Inferences, and Experimental Results** category was renamed **Evaluating Scientific Arguments and Models with Evidence** for the enhanced ACT. The repository keeps an internal compact category code but the student-facing label uses the current enhanced name.
 - Six operational passages plus one EFT passage; 34 scored plus 6 embedded field-test items.
 - Operational passage formats: 2 Data Representation, 3 Research Summaries, 1 Conflicting Viewpoints.
 - Operational item ranges by format: DR 10–12; RS 16–20; CV 6–7.
@@ -70,6 +74,15 @@ The ACT Composite uses English, Mathematics, and Reading. Science is optional an
 - Approximately 5–8 items require outside/background scientific knowledge.
 - Including the EFT passage, Life Science is capped at 3 passages and each other primary content area at 2.
 
+## Scoring conversion sources used by the V1 estimate
+
+- **Online Practice Test 1 Scoring Key and Conversion Tables**  
+  https://www.act.org/content/dam/act/unsecured/documents/ACT-National-Online-Practice-Test-1-Scoring-Key-and-Conversion-Tables.pdf
+- **Online Practice Test 2 Scoring Key**  
+  https://www.act.org/content/dam/act/unsecured/documents/ACT-Nat-Online-Practice-Test-2-Scoring-Key.pdf
+
+Both official raw→scale tables were independently compared with the repository scoring arrays on August 21, 2026. See `SCORE_MODEL.md` and `RELEASE_EVIDENCE_V1.md`.
+
 ## Release rule
 
-If these authoritative sources change, the affected implementation and tests must be reverified before a draft section is promoted. A passing old test suite is not evidence that the current ACT specification is unchanged.
+If these authoritative sources change, the affected implementation, scoring model, tests, and source record must be reverified before a draft candidate is promoted. A passing old test suite is not evidence that the current ACT specification is unchanged.
