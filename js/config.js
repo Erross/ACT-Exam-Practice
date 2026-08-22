@@ -13,7 +13,7 @@ export const EXAM = Object.freeze({
 export const SECTIONS = Object.freeze({
   english: {
     id: "english", label: "English", totalItems: 50, scoredItems: 40, fieldTestItems: 10,
-    minutes: 35, status: "draft",
+    minutes: 35, status: "released",
     operationalBlueprint: { POW: [15,17], KLA: [7,9], CSE: [15,17] },
     operationalPassageLengthBlueprint: { long: 3, short: 2 },
     operationalWritingTypeBlueprint: { informational: [2,3], argumentative: [1,2], narrative: [1,1] },
@@ -23,7 +23,7 @@ export const SECTIONS = Object.freeze({
   },
   math: {
     id: "math", label: "Mathematics", totalItems: 45, scoredItems: 41, fieldTestItems: 4,
-    minutes: 50, status: "draft", calculatorAllowed: true,
+    minutes: 50, status: "released", calculatorAllowed: true,
     // One valid fixed form inside ACT's final enhanced operational ranges:
     // PHM 33 = NQ 5 + Algebra 7 + Functions 8 + Geometry 8 + Statistics & Probability 5;
     // IES 8. Modeling overlaps these categories and must cover at least 8 operational items.
@@ -33,7 +33,7 @@ export const SECTIONS = Object.freeze({
   },
   reading: {
     id: "reading", label: "Reading", totalItems: 36, scoredItems: 27, fieldTestItems: 9,
-    minutes: 40, status: "draft",
+    minutes: 40, status: "released",
     operationalBlueprint: { KID: [12,14], CS: [7,9], IKI: [5,7] },
     operationalGenreBlueprint: { literary: 1, informational: 2 },
     operationalFormatBlueprint: { single: 2, multi: 1 },
@@ -43,7 +43,7 @@ export const SECTIONS = Object.freeze({
   },
   science: {
     id: "science", label: "Science", totalItems: 40, scoredItems: 34, fieldTestItems: 6,
-    minutes: 40, status: "draft", optional: true, calculatorAllowed: false,
+    minutes: 40, status: "released", optional: true, calculatorAllowed: false,
     operationalBlueprint: { IOD: [13,17], SIN: [6,11], EAM: [8,13] },
     operationalFormatBlueprint: { DR: 2, RS: 3, CV: 1 },
     operationalFormatItemRanges: { DR: [10,12], RS: [16,20], CV: [6,7] },
