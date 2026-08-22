@@ -1,11 +1,20 @@
-import test from "node:test"; import assert from "node:assert/strict";
-import { SECTIONS, EXAM } from "../js/config.js";
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SECTIONS, EXAM, isSectionAvailable } from "../js/config.js";
+
 test("enhanced ACT section counts and timing",()=>{
   assert.deepEqual([SECTIONS.english.totalItems,SECTIONS.english.scoredItems,SECTIONS.english.minutes],[50,40,35]);
   assert.deepEqual([SECTIONS.math.totalItems,SECTIONS.math.scoredItems,SECTIONS.math.minutes],[45,41,50]);
   assert.deepEqual([SECTIONS.reading.totalItems,SECTIONS.reading.scoredItems,SECTIONS.reading.minutes],[36,27,40]);
   assert.deepEqual([SECTIONS.science.totalItems,SECTIONS.science.scoredItems,SECTIONS.science.minutes],[40,34,40]);
   assert.deepEqual(EXAM.compositeSections,["english","math","reading"]);
+});
+
+test("draft and released sections remain launchable while planned sections do not",()=>{
+  assert.equal(isSectionAvailable({status:"draft"}),true);
+  assert.equal(isSectionAvailable({status:"released"}),true);
+  assert.equal(isSectionAvailable({status:"planned"}),false);
+  assert.equal(isSectionAvailable(null),false);
 });
 
 test("math fixed form remains inside final enhanced ACT reporting-category ranges",()=>{
