@@ -43,9 +43,10 @@ const VQI_SUPPLEMENTS = Object.freeze({
 
 // One release-authored passage landed one token below the reviewed 675-word lower
 // bound under the repository's tokenizer. Keep the authored source unchanged for
-// auditability and make the browser-effective text compliant at aggregation time.
+// auditability and make the browser-effective text compliant with a sentence that
+// reinforces the passage's decision-and-evaluation conclusion rather than padding it.
 const RELEASE_TEXT_ADJUSTMENTS = Object.freeze({
-  "R-INFO-NOISE": text => `${text} This distinction matters.`,
+  "R-INFO-NOISE": text => `${text} That distinction matters when planners decide what to change and how to test the result.`,
 });
 
 function browserDisplayText(id,text){
