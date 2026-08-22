@@ -56,6 +56,10 @@ export const SECTIONS = Object.freeze({
   },
 });
 
+export function isSectionAvailable(section){
+  return Boolean(section && (section.status === "draft" || section.status === "released"));
+}
+
 export const CATEGORY_LABELS = Object.freeze({
   english: Object.freeze({
     POW: "Production of Writing",
