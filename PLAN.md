@@ -1,6 +1,6 @@
 # ACT V1 Build and Release Plan
 
-## Built and automated-gate complete
+## Complete before promotion
 
 - [x] Establish neutral exam/section architecture.
 - [x] Encode the current enhanced ACT counts, timing, scored/EFT split, and final section blueprints.
@@ -13,27 +13,29 @@
 - [x] Build release-scale Science bank: 137 questions / 24 science sets.
 - [x] Add full ACT controller: English → Math → Reading → optional Science.
 - [x] Add estimated Composite and STEM result views.
-- [x] Add preflight, navigator, flags, submission review, answer explanations, responsive/accessibility first pass, and persisted session recovery.
+- [x] Add preflight, navigator, flags, submission warnings, answer explanations, responsive/accessibility behavior, and persisted session recovery.
 - [x] Bring browser-effective answer-construction metrics inside release gates.
 - [x] Run 5,000 production blueprint draws for each section.
 - [x] Run 5,000 independent retake pairs for each section and hold all sections at ≤40% mean exact-item overlap.
 - [x] Verify build and production-artifact completeness.
-- [x] Record point-in-time automated evidence in `RELEASE_EVIDENCE_V1.md`.
-- [x] Adopt mature ACT content standards and release checklist.
+- [x] Run a complete clean-room audit across the browser-effective 544-question bank.
+- [x] Independently recompute the complete Math bank and quantitative Science/Reading data questions.
+- [x] Review English/Reading/Science for ambiguity, factual correctness, distractor competitiveness, rationale accuracy, and passage/set self-consistency.
+- [x] Check whole-bank duplicate/near-duplicate/variant behavior and originality/provenance assumptions independently of bank-local tests.
+- [x] Repair all substantive clean-room findings and add targeted regressions.
+- [x] Restart the clean-room audit against the repaired effective artifact; zero new substantive findings.
+- [x] Run a naive production-artifact UX/accessibility assessment with no interface coaching.
+- [x] Repair naive-review findings: saved-attempt protection, calculator wording, guessing guidance, timeout feedback, submit labels, production copy, skip navigation, and desktop passage layout.
+- [x] Validate the exact prospective production integration tree against current `main`; the PR merge tree passed the full release gate.
+- [x] Add GitHub Pages deployment from checked `_site/` using the same pinned-action pattern as the working AP practice repository.
+- [x] Finalize pre-production release evidence and PR description.
 
-## Remaining release blockers
+## Promotion / production
 
-- [ ] Run independent clean-room audit across the **entire browser-effective 544-question bank**.
-- [ ] Independently recompute all quantitative Math answers and all quantitative Science/Reading data questions.
-- [ ] Independently review every English/Reading/Science item for ambiguity, factual correctness, distractor competitiveness, rationale accuracy, and passage/set self-consistency.
-- [ ] Check whole-bank originality/provenance and duplicate/near-duplicate/variant behavior independently of existing tests.
-- [ ] Repair every substantive clean-room finding and add regressions where appropriate.
-- [ ] Restart the clean-room audit from scratch after repairs; require zero substantive findings on the final fresh pass.
-- [ ] Run a fresh naive-user/accessibility assessment against the production artifact with no prior interface coaching.
-- [ ] Repair any naive-review findings and repeat with a new assessor if the product is materially misunderstood.
-- [ ] Update/finalize release evidence with clean-room and naive-review results.
-- [ ] Validate the exact prospective production integration tree from current `main`.
-- [ ] Merge only the fully reviewed candidate.
-- [ ] Deploy through GitHub Pages and smoke-test the real public site.
+- [ ] Merge the fully reviewed PR into `main` with an expected-head guard.
+- [ ] Confirm the resulting `main` tree matches the validated candidate plus release-record documentation.
+- [ ] Confirm GitHub Pages deployment succeeds from merged `main`.
+- [ ] Smoke-test the public Home/About/Official Sources pages and section/full-test launch flows.
+- [ ] Record the final production URL and deployment result.
 
-PR #1 must remain draft until the remaining release blockers are complete.
+The reusable quality requirements remain in `ACT_RELEASE_CHECKLIST.md`; point-in-time evidence is in `RELEASE_EVIDENCE_V1.md`.
