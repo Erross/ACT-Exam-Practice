@@ -6,6 +6,36 @@ export function buildFullTestQueue(includeScience=false){
     : ["english","math","reading"];
 }
 
+export function fullTestCommitment(sections,includeScience=false){
+  const queue=buildFullTestQueue(includeScience);
+  return queue.reduce((total,id)=>({
+    questions:total.questions+sections[id].totalItems,
+    minutes:total.minutes+sections[id].minutes,
+  }),{questions:0,minutes:0});
+}
+
+export function fullTestTransition(completedId,nextId){
+  if(completedId==="math" && nextId==="reading"){
+    return {
+      kind:"scheduled-break",
+      heading:"Scheduled break after Mathematics",
+      guidance:"For realistic standard-time practice, take up to 15 minutes before Reading. This practice app does not run a break timer; the Reading timer starts only when you begin the section.",
+    };
+  }
+  if(completedId==="reading" && nextId==="science"){
+    return {
+      kind:"optional-transition",
+      heading:"Optional Science is next",
+      guidance:"Science is optional and is not part of the ACT Composite. Begin when you are ready; its 40-minute timer starts only when you begin the section.",
+    };
+  }
+  return {
+    kind:"section-transition",
+    heading:`Continue to ${nextId==="math"?"Mathematics":nextId==="reading"?"Reading":nextId==="science"?"Science":nextId}`,
+    guidance:"This is a section transition, not the scheduled ACT break. For realistic practice, move on without taking an extended break; the next section timer starts only when you begin it.",
+  };
+}
+
 function roundedAverage(values){
   return Math.round(values.reduce((a,b)=>a+b,0)/values.length);
 }
