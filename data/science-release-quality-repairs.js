@@ -12,7 +12,7 @@ export const SCIENCE_RELEASE_QUALITY_REPAIRS = Object.freeze({
   "S-CV-SEABREEZE-3": {choice:"B",text:"Regional wind can influence a coastal station strongly enough to modify the wind direction that would otherwise follow local daytime heating."},
   "S-CV-SEABREEZE-4": {choice:"B",text:"the land was warmer than the sea, so the local temperature contrast by itself provides a complete explanation for the observed onshore flow."},
   "S-CV-SEABREEZE-5": {choice:"B",text:"temperature is the primary control on coastal wind direction whenever skies are clear and the land surface receives strong daytime sunlight."},
-  "S-CV-SEABREEZE-6": {choice:"B",text:"Land warms faster because soil and rock transfer relatively little solar energy downward compared with the mixing that distributes energy through water."},
+  "S-CV-SEABREEZE-6": {choice:"B",text:"Land warms faster because soil and rock have a higher heat capacity than water, so the same absorbed energy raises their temperature more quickly."},
 });
 
 export function applyScienceReleaseQualityRepairs(sets){
