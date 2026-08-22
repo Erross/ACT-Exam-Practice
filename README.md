@@ -1,60 +1,82 @@
 # ACT Exam Practice
 
-A free, unofficial practice application for the **enhanced ACT**. The project is being built as a sibling to `Erross/AP-Exam-Practice`, but with a neutral exam/section architecture so both products can later be combined into a single application without rewriting their content banks.
+A free, original, unofficial practice application for the **enhanced ACT**. The project is built with a neutral exam/section architecture so its core concepts can later be shared with `Erross/AP-Exam-Practice` without making ACT content depend on AP-specific assumptions.
 
 ## Current development status
 
-`main` is intentionally minimal until the first release is ready. Active work is on `feature/v1-foundation` through draft PR #1.
+`main` remains intentionally minimal until the first release passes its complete release gate. Active development is on `feature/v1-foundation` through draft PR #1.
 
-The current development build provides:
+The current candidate provides:
 
-- a static HTML/CSS/JavaScript application suitable for GitHub Pages;
-- generic exam/section configuration rather than AP-specific assumptions;
-- current enhanced-ACT section lengths and embedded field-test counts;
-- runnable timed practice for English, Mathematics, Reading, and optional Science;
-- full-test mode running English → Mathematics → Reading, with optional Science afterward;
-- scores hidden between sections during full-test mode;
-- saved-attempt recovery using an absolute deadline so refreshing does not reset section time;
-- estimated 1–36 section scores and an estimated ACT Composite after a complete core attempt;
-- estimated-score ranges derived from two official enhanced ACT practice-form conversion tables;
-- runtime answer-choice shuffling that preserves the semantic key;
-- constrained passage/set drawing so linked material remains intact;
-- automated blueprint, scoring, bank-integrity, answer-tell, retake-diversity, session, and build tests, including repeated 500-draw blueprint checks.
+- static HTML/CSS/JavaScript suitable for GitHub Pages;
+- runnable timed English, Mathematics, Reading, and optional Science practice;
+- full-test mode: English → Mathematics → Reading, with optional Science afterward;
+- preflight before the timer starts;
+- question navigator with answered/current/flagged state;
+- saved-attempt recovery using an absolute deadline, including flags and full-test between-section state;
+- explicit submission with unanswered/flagged review warning and automatic timeout submission;
+- section scores hidden between full-test sections;
+- answer review with the actual displayed choice order and rationales;
+- estimated 1–36 section scores, estimated ACT Composite, and estimated STEM when Science is taken;
+- score ranges derived from two current official enhanced-ACT online-practice conversion tables;
+- runtime answer-choice shuffling with semantic-key preservation;
+- constrained whole-passage/set drawing and embedded non-scored field-test handling;
+- production-scale automated evidence: 5,000 valid forms per section and 5,000 independent retake pairs per section;
+- build and production-artifact verification.
 
-### Current draft bank size
+### Browser-effective bank size
 
-| Section | Draft content | Displayed per attempt |
+| Section | Original practice content | Displayed per attempt |
 | --- | ---: | ---: |
-| English | 90 questions across 12 original passages | 50 |
-| Mathematics | 140 original questions across 70 variant families | 45 |
-| Reading | 81 questions across 9 original passages | 36 |
-| Science | 80 questions across 14 original science sets | 40 |
-| **Total** | **391 questions** | — |
+| English | 150 questions across 20 passages | 50 |
+| Mathematics | 140 questions across 70 two-item variant families | 45 |
+| Reading | 117 questions across 13 passage sets | 36 |
+| Science | 137 questions across 24 science sets | 40 |
+| **Total** | **544 questions** | — |
 
-These banks are **development drafts, not released banks**. English, Reading, and Science have now completed an initial diversity expansion beyond minimum runnable scale. All four sections still require deeper content review, difficulty/retake analysis, browser-effective usability review, and independent clean-room release auditing before promotion.
+These banks are still **release candidates, not released banks**. Their scale, automated quality, diversity, blueprint, scoring, session, build, and artifact gates are green, but independent clean-room content review and fresh naive-user review remain release blockers.
 
 ## Enhanced ACT structure modeled
 
-| Section | Total items | Scored items | Field-test items | Time |
+| Section | Total items | Scored items | Embedded field-test | Time |
 | --- | ---: | ---: | ---: | ---: |
 | English | 50 | 40 | 10 | 35 min |
 | Mathematics | 45 | 41 | 4 | 50 min |
 | Reading | 36 | 27 | 9 | 40 min |
 | Science (optional) | 40 | 34 | 6 | 40 min |
 
-The Composite is based on English, Mathematics, and Reading. Science is optional and does not affect the Composite.
+The Composite is based on English, Mathematics, and Reading. Science is optional in the modeled enhanced format and does not affect the Composite. When Science is taken, a separate STEM estimate is shown from Mathematics and Science.
 
-The constrained engines also model the current enhanced passage/set structure: English uses 3 long + 2 short scored passage sets; Reading uses 3 scored + 1 EFT passage with literary/informational, length, and single/paired/VQI constraints; Science uses 2 Data Representation + 3 Research Summaries + 1 Conflicting Viewpoint scored sets plus one six-item EFT set, reporting-category ranges, primary content-area ranges, engineering/design as a secondary code, all-seven-passage content-area maxima, and the background-knowledge item range.
+The constrained engines model the current final enhanced blueprint: English uses 3 long + 2 short operational passages with current writing-type/content-domain rules; Reading uses 1 literary + 2 informational operational passages with 2 single + 1 paired-or-VQI unit; Science uses 2 Data Representation + 3 Research Summaries + 1 Conflicting Viewpoints operational sets with current reporting-category, format-item, content-area, engineering/design, and background-knowledge ranges. Math uses the final enhanced reporting-category composition, modeling minimum, variant exclusion, and increasing-difficulty ordering.
 
-## Score estimates
+See [`OFFICIAL_ACT_SOURCES.md`](OFFICIAL_ACT_SOURCES.md) for the authoritative source snapshot verified August 21, 2026.
+
+## Release-scale evidence
+
+The current automated evidence is recorded in [`RELEASE_EVIDENCE_V1.md`](RELEASE_EVIDENCE_V1.md).
+
+The audited production banks passed **5,000/5,000 forms per section**. Mean exact-item overlap across **5,000 independent retake pairs per section** was:
+
+| Section | Mean overlap |
+| --- | ---: |
+| Mathematics | 32.7% |
+| English | 34.0% |
+| Reading | 30.8% |
+| Science | 30.4% |
+
+Project release target is ≤40% for each section.
+
+The browser-effective answer-construction gates are also green: unique-longest-correct, prose correct-among-longest, correct-vs-distractor mean length, raw key balance, and stacked absolute-language checks.
+
+## Estimated scores
 
 This project **does provide an estimated ACT section score and estimated Composite score**. Estimates are intentionally labeled as such.
 
-The initial scoring model uses the published raw-to-scale tables from two official enhanced ACT online practice tests. For a section raw score, the UI shows the mean rounded estimate and the observed range across those two official practice forms. For a full test, the Composite estimate is the rounded mean of English, Mathematics, and Reading estimates; a combined low/high range is also shown from the corresponding official-practice conversion ranges.
+The scoring model uses the published raw-to-scale tables from official enhanced ACT Online Practice Tests 1 and 2. For a raw score, the UI shows the rounded mean estimate and the observed range across those two official practice-form tables. For a complete core full test, the Composite estimate is the rounded mean of English, Mathematics, and Reading estimates. Science is reported separately and, when taken, contributes with Mathematics to an estimated STEM score.
 
-Real ACT forms are equated separately, so these results are not official ACT score predictions.
+Real ACT forms are equated independently and this site's questions are original unofficial practice material. The result therefore must not be interpreted as an official ACT score prediction.
 
-See `SCORE_MODEL.md`.
+See [`SCORE_MODEL.md`](SCORE_MODEL.md).
 
 ## Development
 
@@ -66,24 +88,24 @@ npm run build
 npm run check
 ```
 
-The build outputs `_site/` for GitHub Pages.
+The build outputs `_site/` for GitHub Pages. `npm run check` includes source tests, production build, artifact validation, the 5,000-form production blueprint audit, and the 5,000-pair retake-diversity gate.
 
-## Release philosophy
+## Release process
 
-A section is not released merely because it has enough questions or passes automated tests. Before promotion it must pass:
+The governing quality rules are in [`CONTENT_STANDARDS.md`](CONTENT_STANDARDS.md) and the complete V1 gate is in [`ACT_RELEASE_CHECKLIST.md`](ACT_RELEASE_CHECKLIST.md).
 
-1. authoritative blueprint verification;
-2. bank/schema and constrained-draw tests;
-3. answer/rationale and quantitative correctness review;
-4. distractor, answer-position, duplicate/variant, and difficulty audits;
-5. browser-effective parity and usability checks;
-6. retake-overlap review once the bank is large enough for meaningful alternate forms;
-7. independent clean-room review after repairs.
+Passing CI is necessary but not sufficient. Before promotion, the candidate still requires:
 
-The draft PR remains open until the banks are expanded and those release gates are complete.
+1. independent clean-room review of the entire browser-effective bank;
+2. independent recomputation/fact checking and ambiguity review;
+3. repair of any substantive findings;
+4. a fresh from-scratch clean-room pass with zero substantive findings;
+5. a fresh naive-user/accessibility review of the production artifact;
+6. exact prospective-production-tree validation;
+7. successful GitHub Pages deployment and public smoke test.
 
 ## Copyright and affiliation
 
-Questions and passages in this repository are original practice material. This project does not copy secure or released ACT questions.
+Questions, passages, scenarios, and synthetic datasets in this repository are original practice material. Official ACT materials are used to verify structure and scoring data; secure/released ACT question wording is not copied into the practice bank.
 
 This project is independent and is not affiliated with, endorsed by, sponsored by, or reviewed by ACT Education Corp. ACT is a trademark of ACT Education Corp.
