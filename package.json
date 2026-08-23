@@ -8,6 +8,7 @@
     "test": "node --test",
     "build": "node tools/build.js",
     "test:artifact": "node tools/artifact-check.js",
+    "export:unified": "node tools/export-unified.js",
     "check": "npm test && npm run build && npm run test:artifact"
   },
   "engines": { "node": ">=22" },
